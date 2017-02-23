@@ -1,0 +1,63 @@
+<div class="col">
+  <div class="">
+    <h1>Cadastro</h1>
+  </div>
+  <div class="divider"></div>
+  <div class="preloader-wrapper big active" ng-show="isSubmiting">
+    <div class="spinner-layer spinner-blue-only">
+      <div class="circle-clipper left">
+        <div class="circle"></div>
+      </div><div class="gap-patch">
+        <div class="circle"></div>
+      </div><div class="circle-clipper right">
+        <div class="circle"></div>
+      </div>
+    </div>
+  </div>
+  <form class="row" ng-hide="isSubmiting">
+    <div ng-if="errMsg" class="card-panel red">
+      <span class="white-text">
+				{{errMsg}}
+			</span>
+    </div>
+    <div class="input-field col s12 m6">
+      <input ng-model="user.Name" type="text" name="name" required>
+      <label>Nome</label>
+    </div>
+    <div class="input-field col s12 m6">
+      <input ng-model="user.Login" type="text" name="username" required>
+      <label>Usuário</label>
+    </div>
+    <div class="input-field col s12 m6">
+      <input ng-model="user.Email" type="email" name="email" required>
+      <label>Email</label>
+    </div>
+    <div class="input-field col s12 m6">
+      <input ng-model="user.Password" type="password" name="password" required>
+      <label>Password</label>
+    </div>
+    <div class="input-field col s12 m6">
+      <input ng-model="user.ConfirmPassword" type="password" name="confirmPassword" required>
+      <label>Confirm Password</label>
+    </div>
+    <div class="input-field col s12 m6 file-field">
+	    <div class="btn">
+		    <span>Foto</span>
+		    <div type="file" ngf-select ng-model="user.Photo" name="Photo"
+               ngf-pattern="image/*" accept="image/*" ngf-max-size="20MB">
+        </div>
+	    </div>
+	    <div class="file-path-wrapper">
+	    	<input class="file-path validate" type="text">
+      </div>
+    </div>
+    <div class="row">
+      <div class="col s6">
+        <a ui-sref="login" type="submit" class="btn-flat left"><i class="material-icons left">send</i>Voltar</a>
+      </div>
+      <div class="col s6">
+        <button ng-click="submit()" type="submit" class="btn-flat right"><i class="material-icons right">send</i>Cadastrar</button>
+      </div>
+    </div>
+  </form>
+</div>

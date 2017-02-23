@@ -1,0 +1,61 @@
+<html ng-app="petutility">
+  <head>
+    <title>PETUtility</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="public/vendor.css"  media="screen,projection"/>
+  </head>
+  <body ng-cloak>
+    <header ng-if="UserService.isAuthenticated() || CandidatoService.isAuthenticated()">
+      <ul style="overflow: hidden;" id="slide-out" class="side-nav fixed deep-orange">
+        <li style="background-color: rgba(0,0,0,0.5)">
+          <div class="userView" style="position:relative;">
+            <section style="position:absolute;top:10px;right:10px;padding:0px;cursor:pointer;"  ng-controller="SideNavController">
+              <a ng-click="logout()"  class="white-text">
+                <img src="data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxMjkgMTI5IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAxMjkgMTI5IiB3aWR0aD0iMzJweCIgaGVpZ2h0PSIzMnB4Ij4KICA8Zz4KICAgIDxnPgogICAgICA8cGF0aCBkPSJtODguNiw5NC40YzAuOCwwLjggMS44LDEuMiAyLjksMS4yczIuMS0wLjQgMi45LTEuMmwyNy0yN2MwLjItMC4yIDAuNC0wLjQgMC41LTAuNiAwLDAgMC4xLTAuMSAwLjEtMC4yIDAuMS0wLjIgMC4yLTAuNCAwLjMtMC41IDAtMC4xIDAtMC4yIDAuMS0wLjIgMC4xLTAuMiAwLjEtMC4zIDAuMi0wLjUgMC4xLTAuMyAwLjEtMC41IDAuMS0wLjggMC0wLjMgMC0wLjUtMC4xLTAuOCAwLTAuMi0wLjEtMC40LTAuMi0wLjUgMC0wLjEgMC0wLjItMC4xLTAuMi0wLjEtMC4yLTAuMi0wLjQtMC4zLTAuNiAwLDAgMC0wLjEtMC4xLTAuMS0wLjEtMC4yLTAuMy0wLjQtMC41LTAuNmwtMjctMjdjLTEuNi0xLjYtNC4yLTEuNi01LjgsMC0xLjYsMS42LTEuNiw0LjIgMCw1LjhsMjAsMjBoLTcxLjFjLTIuMywwLTQuMSwxLjgtNC4xLDQuMSAwLDIuMyAxLjgsNC4xIDQuMSw0LjFoNzEuMWwtMjAsMjBjLTEuNiwxLjQtMS42LDQgMCw1LjZ6IiBmaWxsPSIjZmY1NzIyIi8+CiAgICAgIDxwYXRoIGQ9Im0xMC41LDEyMi41aDU0YzIuMywwIDQuMS0xLjggNC4xLTQuMXYtNDAuM2MwLTIuMy0xLjgtNC4xLTQuMS00LjFzLTQuMSwxLjgtNC4xLDQuMXYzNi4yaC00NS44di05OS43aDQ1Ljh2MzYuMmMwLDIuMyAxLjgsNC4xIDQuMSw0LjFzNC4xLTEuOCA0LjEtNC4xdi00MC4zYzAtMi4zLTEuOC00LjEtNC4xLTQuMWgtNTRjLTIuMywwLTQuMSwxLjgtNC4xLDQuMXYxMDcuOWMwLjEsMi4zIDEuOSw0LjEgNC4xLDQuMXoiIGZpbGw9IiNmZjU3MjIiLz4KICAgIDwvZz4KICA8L2c+Cjwvc3ZnPgo=" />
+              </a>
+            </section>
+            <img class="background" ng-src="{{user.CoverPhoto}}">
+            <a>
+              <img class="circle" ng-src="{{user.Photo}}">
+            </a>
+            <a ui-sref="logged.profile">
+              <span class="white-text name">{{user.Name}}</span>
+            </a>
+            <a>
+              <span class="white-text email">{{user.Email}}</span>
+            </a>
+          </div>
+        </li>
+        <li ng-repeat="state in stateFac.get()" ng-if="UserService.isAuthenticated() && state.data.displayNav && state.name.indexOf('logged') === 0"><a ui-sref="{{state.name}}"><i class="material-icons right" ng-if="state.name == stateFac.current.name">arrow_backward</i>{{state.data.tabDisplayName}}</a></li>
+        <li ng-repeat="state in stateFac.get()" ng-if="CandidatoService.isAuthenticated() && state.data.displayNav && state.name.indexOf('candidato') === 0"><a ui-sref="{{state.name}}"><i class="material-icons right" ng-if="state.name == stateFac.current.name">arrow_backward</i>{{state.data.tabDisplayName}}</a></li>
+      </ul>
+
+      <nav class="hide-on-large-only">
+        <div class="nav-wrapper">
+          <a class="brand-logo center">PETUtility</a>
+          <ul class="left">
+            <li><a data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <header ng-if="!UserService.isAuthenticated() && !CandidatoService.isAuthenticated()">
+      <nav>
+        <div class="nav-wrapper">
+          <a class="brand-logo center">PETUtility</a>
+        </div>
+      </nav>
+    </header>
+
+    <main style="position: relative;" >
+      <div ui-view class="container" />
+    </main>
+
+    <style type="text/css" ng-if="UserService.isAuthenticated() || CandidatoService.isAuthenticated()">header, main, footer {padding-left: 300px;} @media only screen and (max-width : 992px) {header, main, footer {padding-left: 0;}}</style>
+
+    <script type="text/javascript" src="public/vendor.min.js"></script>
+    <script type="text/javascript" src="public/bundle.min.js"></script>
+  </body>
+</html>

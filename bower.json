@@ -1,0 +1,30 @@
+{
+  "name": "petutility",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "PET"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/pet-informatica/PET-Utility-NODE",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fullcalendar": "latest",
+    "angular-ui-router": "latest",
+    "angular-resource": "1.6.1",
+    "angular-cookies": "latest",
+    "angular-ui-calendar": "latest",
+    "ng-file-upload": "latest",
+    "jquery-timepicker-jt": "latest"
+  },
+  "resolutions": {
+    "angular": "1.6.1",
+    "jquery": "3.1.0"
+  }
+}

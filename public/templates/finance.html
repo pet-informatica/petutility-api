@@ -1,0 +1,470 @@
+<div class="col">
+	</br>
+	<div class="row">
+		<div class="col s12">
+      <ul class="tabs" ng-init="tab=1" style="cursor: pointer;">
+        <li class="tab col s3"><a ng-click="tab=1" ng-class="{'active': tab==1}">Pagamentos</a></li>
+	      <li class="tab col s3"><a ng-click="tab=2" ng-class="{'active': tab==2}">Multas</a></li>
+        <li class="tab col s3"><a ng-click="tab=3" ng-class="{'active': tab==3}">Bolsas</a></li>
+        <li class="tab col s3"><a ng-click="tab=4" ng-class="{'active': tab==4}">Gastos</a></li>
+      </ul>
+    </div>
+	</div>
+
+	<div class="divider"></div>
+
+	<div ng-if="errMsg" class="card-panel red">
+    <span class="white-text">
+      {{errMsg}}
+    </span>
+  </div>
+
+	<div id="payments" ng-show="tab==1" class="col s12 tab-div">
+		</br>
+		<div class="row">
+			<div id="filterButtons" class="center">
+				<a class="btn-floating btn-small waves-effect waves-light {{acceptedColor}} center" ng-click="selectStatus(1)">
+		 		 <i class="material-icons">thumb_up</i>
+		 	 	</a>
+
+				<a class="btn-floating btn-small waves-effect waves-light {{pendingColor}} center" ng-click="selectStatus(3)">
+		 		 <i class="material-icons">query_builder</i>
+		 	 	</a>
+
+				<a class="btn-floating btn-small waves-effect waves-light {{refusedColor}} center" ng-click="selectStatus(2)">
+		 		 <i class="material-icons">thumb_down</i>
+		 	 	</a>
+			</div>
+		</div>
+
+		<ul class="collection">
+    	<div ng-repeat="payment in payments | orderBy: 'Date'">
+				<li class="collection-item avatar">
+		      <i class="material-icons circle {{payment.IconColor}}">{{payment.Icon}}</i>
+					<p ng-show="isPigpetAccount"><strong>PETiano: </strong>{{PETianosList[payment.PETianoId].Name}}</p>
+	      	<p><strong>R$ {{payment.Value}}</strong></p>
+					<p><strong>{{payment.TypeText}}</strong></p>
+					<p>Forma de pagamento: {{payment.InstrumentName}}</p>
+					<p>Data: {{payment.Date | date: 'dd/M/yy' }}</p>
+					<div style="margin-top: 10px" class="col s12" ng-show="checkIfHasPhoto(payment.Photo)">
+						<img ngf-thumbnail="payment.Photo" class="circle" style="margin: auto; display: block; width:30vw; height:30vw;"/>
+					</div>
+					<p>Obervações: {{payment.Notes}}</p>
+					<p ng-show="{{payment.Status}} == 2">Motivo da recusa: {{payment.RefusedJustification}}</p>
+
+					<div class="secondary-content">
+						<a ng-show="isValidePaymentStatus(payment.Status) && !isPigpetAccount" style="cursor: pointer;" ng-click="openUpdatePaymentModal(payment)"><i class="material-icons">edit</i></a>
+						<a ng-show="isValidePaymentStatus(payment.Status) && !isPigpetAccount" style="cursor: pointer;" ng-click="deletePayment(payment.Id)"><i class="material-icons">delete</i></a>
+						<a ng-show="payment.Status == 3 && isPigpetAccount" style="cursor: pointer;"><i class="material-icons modal-trigger" ng-click="refusePaymentModalTrigger(payment.Id)">clear</i></a>
+						<a ng-show="payment.Status == 3 && isPigpetAccount" style="cursor: pointer;" ng-click="acceptPayment(payment.Id)"><i class="material-icons">done</i></a>
+					</div>
+		    </li>
+				<div class="divider"></div>
+			</div>
+  	</ul>
+
+		<a class="btn-floating btn-large modal-trigger waves-effect waves-light right" href="#createPaymentModal" style="position: fixed; right: 20px; bottom: 10px; background-color: #e65100;" ng-show="!isPigpetAccount">
+		 <i class="material-icons">add</i>
+		</a>
+	</div>
+
+	<div id="penalties" ng-show="tab==2" class="col s12 tab-div">
+		<ul class="collection">
+    	<div ng-repeat="penalty in penalties | orderBy: 'Date'">
+				<li class="collection-item avatar">
+		      <i class="material-icons circle {{penalty.StatusIconColor}}">{{penalty.StatusIcon}}</i>
+					<p><strong>Valor: </strong>{{penalty.Value}}</p>
+					<p ng-show="isPigpetAccount">PETiano: {{penalty.PETianoName}}</p>
+					<p>Motivo: {{penalty.PenaltyJustification}}</p>
+					<p>Data: {{penalty.Date | date: 'dd/M/yy' }}</p>
+					<div class="secondary-content" ng-show="isPigpetAccount && (penalty.Status == 2)">
+						<a style="cursor: pointer;" ng-click="changePenaltyStatus(penalty.Id)"><i class="material-icons">done</i></a>
+						<a style="cursor: pointer;" ng-click="openUpdatePenaltyModal(penalty)"><i class="material-icons">edit</i></a>
+						<a style="cursor: pointer;" ng-click="deletePenalty(penalty.Id)"><i class="material-icons">delete</i></a>
+					</div>
+		    </li>
+				<div class="divider"></div>
+			</div>
+  	</ul>
+
+		<a class="btn-floating btn-large modal-trigger waves-effect waves-light right" href="#createPenaltyModal" style="position: fixed; right: 20px; bottom: 10px; background-color: #e65100;" ng-show="isPigpetAccount">
+		 <i class="material-icons">add</i>
+		</a>
+	</div>
+
+	<div id="pockets" ng-show="tab==3" class="col s12 tab-div">
+
+		<div class="row">
+			<h5 class="center" style="color: #e65100;"><strong>PigPET: </strong> {{pigPetBalance | currency}}
+				<a ng-show="isPigpetAccount"><i class="material-icons tiny modal-trigger" style="cursor:pointer;" href="#changePigPetValueModal">edit</i></a></h5>
+
+		</div>
+		<div class="divider"></div>
+
+		<ul class="collection">
+    	<div ng-repeat="pocket in pockets | orderBy: ['-Year', '-Month']">
+				<li class="collection-item avatar">
+						<p><strong>Ano: </strong>{{pocket.Year}}</p>
+						<p><strong>Mês: </strong>{{pocket.MonthName}}</p>
+						<p>Data: {{pocket.Date | date: 'dd/M/yy' }}</p>
+					<div class="secondary-content">
+						<a><i class="material-icons modal-trigger" style="cursor:pointer;" ng-click="editPocketOpenModal(pocket.Id)">edit</i></a>
+						<a ng-click="deletePocket(pocket.Id)"><i class="material-icons" style="cursor:pointer;">delete</i></a>
+					</div>
+		    </li>
+				<div class="divider"></div>
+			</div>
+  	</ul>
+
+		<a class="btn-floating btn-large modal-trigger waves-effect waves-light right" href="#createPocketModal" style="position: fixed; right: 20px; bottom: 10px; background-color: #e65100;" ng-show="isPigpetAccount">
+		 <i class="material-icons">add</i>
+		</a>
+	</div>
+
+	<div id="spendings" ng-show="tab==4" class="col s12 tab-div">
+		<ul class="collection">
+    	<div ng-repeat="spending in spendings | orderBy: 'Date'">
+				<li class="collection-item avatar">
+		      <i class="material-icons circle {{spending.StatusIconColor}}">{{spending.StatusIcon}}</i>
+						<p><strong>Valor: </strong>R$ {{spending.Value}}</p>
+						<p><strong>Descrição: </strong>{{spending.Description}}</p>
+						<p>Data: {{spending.Date | date: 'dd/M/yy' }}</p>
+
+					<div class="secondary-content">
+						<a ng-show="isPigpetAccount && spending.Status == 2" style="cursor: pointer;" ng-click="openUpdateSpendingModal(spending.Id)"><i class="material-icons">edit</i></a>
+						<a ng-show="isPigpetAccount" style="cursor: pointer;" ng-click="deleteSpending(spending.Id, spending.Value, spending.Status)"><i class="material-icons">delete</i></a>
+						<a ng-show="canAcceptPenalty(spending.Status)" style="cursor: pointer;" ng-click="acceptSpending(spending.Id, spending.Value)"><i class="material-icons">done</i></a>
+					</div>
+
+		    </li>
+				<div class="divider"></div>
+			</div>
+  	</ul>
+
+		<a class="btn-floating btn-large modal-trigger waves-effect waves-light right" href="#createSpendingModal" style="position: fixed; right: 20px; bottom: 10px; background-color: #e65100;">
+		 <i class="material-icons">add</i>
+		</a>
+	</div>
+
+
+
+
+	<!-- MODALS -->
+
+	<div id="createPaymentModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Adicionar Pagamento</h4>
+			<div class="divider"></div>
+      <div class="row">
+				<div class="col s6">
+					<input type="number" placeholder="Valor" class="validate" ng-model="payment.value">
+				</div>
+				<div class="col s6">
+					<select id="paymenttype">
+						<option value="" disabled selected>Selecione o tipo de pagamento</option>
+			      <option value="1">Multa</option>
+			      <option value="2">PigPET</option>
+			      <option value="3">Crédito</option>
+					</select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<select id="paymentinstrument" ng-model="payment.instrument">
+						<option value="" disabled selected>Selecione o tipo de pagamento</option>
+			      <option value="1">Transferência</option>
+			      <option value="2">Dinheiro</option>
+			      <option value="3">Crédito</option>
+					</select>
+				</div>
+				<div class="col s6 file-field input-field">
+			    <button class="btn">
+				    <span>Comprovante</span>
+				    <input
+				    	type="file"
+				    	ngf-select
+				    	ng-model="payment.Photo"
+				    	name="Photo"
+				    	ngf-pattern="image/*"
+				    	accept="image/*"
+				    	ngf-max-size="20MB">
+			    </button>
+			    <div class="file-path-wrapper">
+			    	<input class="file-path validate" type="text">
+			    </div>
+	    	</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="payment.date">
+				</div>
+			</div>
+			<input type="text" placeholder="Observações" class="validate" ng-model="payment.notes">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPayment(payment.value, payment.date, payment.notes, payment.instrument, payment.Photo)">Adicionar</a>
+    </div>
+  </div>
+
+	<div id="createPenaltyModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Adicionar Multa</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<input type="number" class="validate" placeholder="Valor" ng-model="penalty.value">
+				</div>
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="penalty.date">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<select id="penaltyPETianoId" ng-model="penalty.petianoid">
+			      <option ng-repeat="(petianoId, petiano) in PETianosList | NoEgressosFilter" value="{{petiano.Id}}" data-icon="{{petiano.Photo}}" class="circle">{{petiano.Name}}({{petiano.Login}})</option>
+					</select>
+				</div>
+			</div>
+			<input type="text" placeholder="Motivo" class="validate" ng-model="penalty.justification">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPenalty(penalty.value, penalty.date,penalty.justification,penalty.petianoid)">Adicionar</a>
+    </div>
+  </div>
+
+	<div id="createPocketModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Adicionar Bolsa</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<select id="pocketMonth" ng-model="pocket.month">
+			      <option value="" disabled selected>Selecione o mês</option>
+			      <option value="1">Janeiro</option>
+			      <option value="2">Fevereiro</option>
+			      <option value="3">Março</option>
+			      <option value="4">Abril</option>
+			      <option value="5">Maio</option>
+			      <option value="6">Junho</option>
+			      <option value="7">Julho</option>
+			      <option value="8">Agosto</option>
+			      <option value="9">Setembro</option>
+			      <option value="10">Outubro</option>
+			      <option value="11">Novembro</option>
+			      <option value="12">Dezembro</option>
+			    </select>
+				</div>
+				<div class="col s6">
+					<input placeholder="Ano" id="pocketYear" type="number" class="validate" ng-model="pocket.year">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="pocket.date">
+				</div>
+			</div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPocket(pocket.month, pocket.year, pocket.date)">Adicionar</a>
+    </div>
+  </div>
+
+	<div id="createSpendingModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Adicionar Gasto</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<input type="number" class="validate" placeholder="Valor" ng-model="spending.value">
+				</div>
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="spending.date">
+				</div>
+			</div>
+			<input type="text" placeholder="Descrição" class="validate" ng-model="spending.description">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createSpending(spending.value, spending.date, spending.description)">Adicionar</a>
+    </div>
+  </div>
+
+	<div id="refusePaymentModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Recusar pagamento</h4>
+			<div class="divider"></div>
+			<input type="text" placeholder="Justificativa" class="validate" ng-model="payment.justification">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="refusePayment(payment.justification)">Recusar</a>
+    </div>
+  </div>
+
+	<!-- UPDATE MODALS-->
+
+	<div id="changePigPetValueModal" class="small modal modal-footer">
+    <div class="modal-content">
+      <h4>Alterar PigPET</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<input type="number" placeholder="Valor" class="validate" ng-model="pigpet.value">
+				</div>
+			</div>
+			<input type="text" placeholder="Motivo da alteração manual" class="validate" ng-model="pigpet.justification">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePigPetBalance(pigpet.value, pigpet.justification)">Confirmar</a>
+    </div>
+  </div>
+
+	<div id="editPocketModal" class="small modal modal-footer">
+    <div class="modal-content">
+      <h4>Alterar bolsa</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<select id="pocketMonth" ng-model="pocket.month">
+			      <option value="" disabled selected>Selecione o mês</option>
+			      <option value="1">Janeiro</option>
+			      <option value="2">Fevereiro</option>
+			      <option value="3">Março</option>
+			      <option value="4">Abril</option>
+			      <option value="5">Maio</option>
+			      <option value="6">Junho</option>
+			      <option value="7">Julho</option>
+			      <option value="8">Agosto</option>
+			      <option value="9">Setembro</option>
+			      <option value="10">Outubro</option>
+			      <option value="11">Novembro</option>
+			      <option value="12">Dezembro</option>
+			    </select>
+				</div>
+				<div class="col s6">
+					<input placeholder="Ano" id="pocketYear" type="number" class="validate" ng-model="pocket.year">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="pocket.date">
+				</div>
+			</div>
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePocket(pocket.month, pocket.year, pocket.date)">Confirmar</a>
+    </div>
+  </div>
+
+	<div id="updatePaymentModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Alterar Pagamento</h4>
+			<div class="divider"></div>
+      <div class="row">
+				<div class="col s6">
+					<input type="number" placeholder="Valor" class="validate" ng-model="paymentToUpdate.Value">
+				</div>
+				<div class="col s6">
+					<select id="updatepaymenttype">
+						<option value="" disabled>Selecione o tipo de pagamento</option>
+			      <option value="1">Multa</option>
+			      <option value="2">PigPET</option>
+			      <option value="3">Crédito</option>
+					</select>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<select id="paymentinstrument" ng-model="paymentToUpdate.Instrument">
+						<option value="" disabled>Selecione o tipo de pagamento</option>
+			      <option value="1">Transferência</option>
+			      <option value="2">Dinheiro</option>
+			      <option value="3">Crédito</option>
+					</select>
+				</div>
+				<div class="col s6 file-field input-field">
+			    <button class="btn">
+				    <span>Comprovante</span>
+				    <input
+				    	type="file"
+				    	ngf-select
+				    	ng-model="paymentToUpdate.Photo"
+				    	name="Photo"
+				    	ngf-pattern="image/*"
+				    	accept="image/*"
+				    	ngf-max-size="20MB">
+			    </button>
+			    <div class="file-path-wrapper">
+			    	<input class="file-path validate" type="text">
+			    </div>
+	    	</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<input class="datepicker" placeholder="Data" type="date" ng-model="paymentToUpdate.Date">
+				</div>
+			</div>
+			<input type="text" placeholder="Observações" class="validate" ng-model="paymentToUpdate.Notes">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePayment()">Confirmar</a>
+    </div>
+  </div>
+
+	<div id="updatePenaltyModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Alterar Multa</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<input type="number" class="validate" placeholder="Valor" ng-model="penaltyToUpdate.Value">
+				</div>
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="penaltyToUpdate.Date">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col s6">
+					<select id="penaltyPETianoId">
+			      <option ng-repeat="(petianoId, petiano) in PETianosList | NoEgressosFilter" value="{{petiano.Id}}" data-icon="{{petiano.Photo}}" ng-selected="petianoId == penaltyToUpdate.PETianoId" class="circle">{{petiano.Name}}({{petiano.Login}})</option>
+					</select>
+				</div>
+			</div>
+			<input type="text" placeholder="Motivo" class="validate" ng-model="penaltyToUpdate.PenaltyJustification">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePenalty()">Confirmar</a>
+    </div>
+  </div>
+
+	<div id="updateSpendingModal" class="modal modal-footer">
+    <div class="modal-content">
+      <h4>Alterar Gasto</h4>
+			<div class="divider"></div>
+			<div class="row">
+				<div class="col s6">
+					<input type="number" class="validate" placeholder="Valor" ng-model="spending.value">
+				</div>
+				<div class="col s6">
+					<input type="date" class="datepicker" placeholder="Data" ng-model="spending.date">
+				</div>
+			</div>
+			<input type="text" placeholder="Descrição" class="validate" ng-model="spending.description">
+    </div>
+    <div class="modal-footer">
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updateSpending(spending.value, spending.date, spending.description)">Adicionar</a>
+    </div>
+  </div>
+
+	<script>
+		$(document).ready(function() {
+		  $('.modal-trigger').leanModal();
+		});
+		$(document).ready(function() {
+	    $('select').material_select();
+	  });
+		$('.datepicker').pickadate({
+	    selectMonths: true, // Creates a dropdown to control month
+	    selectYears: 15 // Creates a dropdown of 15 years to control year
+	  });
+	</script>
+
+</div>

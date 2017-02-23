@@ -1,0 +1,53 @@
+<div class="card-panel">
+  <div class="">
+    <div class="" ng-show="candidato.SelecaoId && !isTimeouting">
+      <!-- MOSTRAR SELECAO -->
+      <p>
+        Seleção de {{selecao.Year}}
+      </p>
+      <div ng-show="candidato.EtapaId">
+        <!-- MOSTRAR QUAL A ETAPA E DESCRICAO -->
+        <p>
+          Etapa da selação: {{etapa.Description}}
+        </p>
+      </div>
+      <div ng-show="!candidato.EtapaId">
+        <p>
+          Você não foi cadastrado em nenhuma etapa por enquanto
+        </p>
+      </div>
+    </div>
+    <div class="" ng-show="!candidato.SelecaoId && !isTimeouting">
+      <p>
+        Você não está cadastrado em nenhuma seleção
+      </p>
+    </div>
+    <form ng-show="etapa.CanUpdate">
+      <div class="row input-field file-field">
+        <div class="btn">
+          <span>Curriculo</span>
+          <input type="file" ngf-select ng-model="candidato.Curriculum"
+          ngf-max-size="30MB"><!-- ngf-pattern="image/*" accept="image/*" -->
+        </div>
+        <div class="file-path-wrapper">
+  	    	<input class="file-path validate" type="text">
+        </div>
+      </div>
+      <div class="row input-field file-field">
+        <div class="btn">
+          <span>Historico escolar</span>
+          <input type="file" ngf-select ng-model="candidato.ScholarHistoric"
+          ngf-max-size="30MB"><!-- ngf-pattern="image/*" accept="image/*" -->
+        </div>
+        <div class="file-path-wrapper">
+  	    	<input class="file-path validate" type="text">
+        </div>
+      </div>
+
+      <button class="btn waves-effect waves-light" ng-click="update()">Upload
+        <i class="material-icons right">send</i>
+      </button>
+
+    </form>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<h3>
+  Candidatos
+</h3>
+<table class="responsive-table">
+  <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Login</th>
+      <th>
+        <input type="checkbox" id="selectAll" ng-model="selectAll">
+        <label for="selectAll"/>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="candidato in candidatos">
+      <td>{{candidato.Name}}</td>
+      <td>{{candidato.Login}}</td>
+      <td>
+        <input
+          type="checkbox" id="select{{candidato.Id}}"
+          ng-model="candidato.selected"
+          ng-disabled="selectAll" >
+        <label for="select{{candidato.Id}}"/>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="row">
+  <div class="col s12">
+    <button class="waves-effect waves-teal btn-flat right" ng-click="openCandidatoListModal()" >
+      MOVER
+      <i class="material-icons right">
+        compare_arrows
+      </i>
+    </button>
+  </div>
+</div>
+<div id="candidatoListModal" class="modal" >
+  <div class="modal-content">
+    <h1>Etapas</h1>
+    <div class="collection">
+      <a ng-repeat="etapa in etapas" ng-click="move(etapa)" style="cursor:pointer;" class="collection-item">{{etapa.Description}}</a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="waves-effect waves-teal btn right green" ng-click="aprove()">
+      APROVAR
+    </button>
+  </div>
+</div>

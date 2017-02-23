@@ -1,0 +1,15 @@
+{
+	"database":
+	{
+		"uri": "postgres://pet:petutility!@172.18.100.10:5432/database",
+		"options":
+		{
+			"pool":
+			{
+				"max": 20,
+				"min": 0,
+				"idle": 10000
+			}
+		}
+	}
+}

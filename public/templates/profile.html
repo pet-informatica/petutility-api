@@ -1,0 +1,118 @@
+<div class="card-panel white">
+	<div style="background-image: url('{{files.CoverPhoto || localUser.CoverPhoto}}'); background-repeat: no-repeat; background-size: cover; background-position: center;" class="row">
+		<div style="margin-top: 10px" class="col s12">
+			<img ngf-thumbnail="files.Photo || localUser.Photo" class="circle" style="margin: auto; display: block; width:30vw; height:30vw;"/>
+		</div>
+		<div style="margin-top: 10px; background-color: rgba(0,0,0,0.7);" class="col s12">
+			<p class="center-align flow-text orange-text">{{localUser.Name}}</p>
+		</div>
+	</div>
+	<form ng-submit="submitChanges()">
+		<div class="row">
+			<div class="col s12 input-field">
+				<i class="material-icons prefix">account_circle</i>
+				<input id="nameProfile" type="text" name="Nome" ng-model="localUser.Name" ng-disabled="!editMode">
+				<label for="nameProfile">Nome</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col s12 input-field">
+				<i class="material-icons prefix">email</i>
+				<input id="emailProfile" type="email" name="Email" ng-model="localUser.Email" ng-disabled="!editMode">
+				<label for="emaiProfile">E-mail</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col s12 m12 l7 input-field">
+				<i class="material-icons prefix">perm_identity</i>
+				<input id="cpfProfile" type="text" name="Cpf" ng-model="localUser.Cpf" ng-disabled="!editMode">
+				<label for="cpfProfile">CPF</label>
+			</div>
+			<div class="col s12 m12 l5 input-field">
+				<i class="material-icons prefix">perm_identity</i>
+				<input id="rgProfile" type="text" name="Rg" ng-model="localUser.Rg" ng-disabled="!editMode">
+				<label for="rgProfile">RG</label>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col s12 file-field input-field">
+			    <div class="btn" ng-disabled="!editMode">
+				    <span>Foto de Perfil</span>
+				    <input
+				    	type="file"
+				    	ngf-select
+				    	ng-model="files.Photo"
+				    	name="Photo"
+				    	ngf-pattern="image/*"
+				    	accept="image/*"
+				    	ngf-max-size="20MB">
+			    </div>
+			    <div class="file-path-wrapper">
+			    	<input class="file-path validate" type="text" ng-disabled="!editMode">
+			    </div>
+	    	</div>
+		</div>
+		<div class="row">
+			<div class="col s12 file-field input-field">
+			    <div class="btn" ng-disabled="!editMode">
+				    <span>Foto de Capa</span>
+				    <input
+				    	type="file"
+				    	ngf-select
+				    	ng-model="files.CoverPhoto"
+				    	name="CoverPhoto"
+				    	ngf-pattern="image/*"
+				    	accept="image/*"
+				    	ngf-max-size="20MB">
+			    </div>
+			    <div class="file-path-wrapper">
+			    	<input class="file-path validate" type="text" ng-disabled="!editMode">
+			    </div>
+	    	</div>
+		</div>
+		<div class="row hide-on-med-and-down" ng-if="editMode">
+			<button type="submit" class="right btn waves-effect waves-light"><i class="material-icons right">save</i>Salvar</button>
+		</div>
+		<div class="row hide-on-large-only" ng-if="editMode">
+			<button type="submit" class="btn waves-effect waves-light"><i class="material-icons right">save</i>Salvar</button>
+		</div>
+	</form>
+</div>
+<div id="chngPasswordModal" class="modal">
+	<form ng-submit="changePassword(oldPassword, newPassword1)">
+		<div class="modal-content">
+			<h4>Alterar Senha</h4>
+			<div class="row">
+				<div class="input-field col s12 m6">
+					<input type="password" ng-model="oldPassword">
+					<label>Senha Atual</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="input-field col s12 m6">
+					<input type="password" ng-model="newPassword1">
+					<label>Nova Senha</label>
+				</div>
+				<div class="input-field col s12 m6">
+					<input type="password" ng-model="newPassword2">
+					<label>Confirmação</label>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button type="submit" class="btn-flat" ng-disabled="!newPassword1 || (newPassword1 != newPassword2)">
+				<i class="material-icons right">lock</i>
+				ALTERAR
+			</button>
+		</div>
+	</form>
+</div>
+<div class="fixed-action-btn" style="position: fixed; right: 20px; bottom: 10px;" >
+	<a class="btn-floating btn-large orange darken-4">
+		<i class="material-icons">more_horiz</i>
+	</a>
+	<ul>
+		<li ng-if="!editMode"><a ng-click="toggleEditMode()" class="btn-floating red waves-effect waves-light"><i class="material-icons">edit</i></a></li>
+		<li><a ng-click="openChngPassword()" class="btn-floating yellow darken-2 waves-effect waves-light"><i class="material-icons">lock</i></a></li>
+	</ul>
+</div>

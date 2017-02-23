@@ -1,0 +1,51 @@
+<div class="card-panel">
+  <form class="">
+    <div ng-hide="isTimeouting">
+      <div ng-show="!selecao.IsOpen">
+        <p>
+          Não há seleções vigentes no momento!
+        </p>
+      </div>
+      <div ng-show="selecao.IsOpen">
+        <div class="row">
+          <div class="col s12">
+            <p>
+              Seleção de {{selecao.Year}}
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col s12">
+            <p>
+              Edital: {{selecao.Description}}
+            </p>
+          </div>
+        </div>
+        <div ng-show="!candidato.SelecaoId">
+          <div class="row">
+            <div class="col s12">
+              <input type="checkbox" id="c" ng-click="iAgree=!iAgree"/>
+              <label for="c">Eu concordo</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s12">
+              <button class="btn waves-effect waves-light" ng-click="join()" ng-disabled="!iAgree">Participar
+                <i class="material-icons right">send</i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div ng-show="candidato.SelecaoId">
+          <div class="row">
+            <div class="col s12">
+              <p>
+                Você já está participando dessa seleção!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

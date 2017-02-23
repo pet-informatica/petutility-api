@@ -1,0 +1,75 @@
+doctype html
+html
+	head
+		link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css')
+		title= 'PETUtility'
+	body
+		div(class='container')
+			div(class='row')
+				div(class='col s12')
+					h1= Date.getDate() + '/' + (Date.getMonth() + 1) + '/' + Date.getFullYear()
+			div(class='row')
+				div(class='col s12')
+					ul(class='collection')
+						li(class='collection-item avatar')
+							img(class='circle', src=Ateiro.Photo)
+							span(class='title')= 'Ateiro'
+							p= Ateiro.Name
+						li(class='collection-item avatar')
+							img(class='circle', src=President.Photo)
+							span(class='title')= 'Presidente'
+							p= President.Name
+			div(class='row card-panel orange darken-4 white-text')
+				div(class='col s12')
+					div(class='row')
+						p= 'Ausentes (' + AbsentsOrLates.filter((v)=>{return v.Type==1;}).length + ')'
+						each absent in AbsentsOrLates.filter((v)=>{return v.Type==1})
+							div(class='chip', style= 'background-color:'+(absent.IsJustified?'#AED581':'#E57373')+';')
+								span
+									img(src=absent.PETiano.Photo)
+									= absent.PETiano.Name
+					div(class='row')
+						p= 'Atrasados (' + AbsentsOrLates.filter((v)=>{return v.Type==2;}).length + ')'
+						each absent in AbsentsOrLates.filter((v)=>{return v.Type==2})
+							div(class='chip', style= 'background-color:'+(absent.IsJustified?'#AED581':'#E57373')+';')
+								span
+									img(src=absent.PETiano.Photo)
+									= absent.PETiano.Name
+			div(class='row')
+				ul(class='collection with-header')
+					li(class='collection-header')
+						h4
+							= 'Fixos'
+					each agendaPoint in AgendaPoints.filter((v)=>{return v.Status==2;})
+						li(class='collection-item')
+							div
+								h5
+									= agendaPoint.Title
+								p(class='flow-text', style='word-wrap:break-word;white-space: pre-line;')
+									= agendaPoint.Description
+			div(class='row')
+				ul(class='collection with-header')
+					li(class='collection-header')
+						h4
+							= 'Pendentes'
+					each agendaPoint in AgendaPoints.filter((v)=>{return v.Status==3;})
+						li(class='collection-item')
+							div
+								h5
+									= agendaPoint.Title
+								p(class='flow-text', style='word-wrap:break-word;white-space: pre-line;')
+									= agendaPoint.Description
+			div(class='row')
+				ul(class='collection with-header')
+					li(class='collection-header')
+						h4
+							= 'Novos'
+					each agendaPoint in AgendaPoints.filter((v)=>{return v.Status==4;})
+						li(class='collection-item')
+							div
+								h5
+									= agendaPoint.Title
+								p(class='flow-text', style='word-wrap:break-word;white-space: pre-line;')
+									= agendaPoint.Description
+		script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.1.min.js')
+		script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js')
