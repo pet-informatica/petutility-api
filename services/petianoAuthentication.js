@@ -50,7 +50,7 @@ module.exports = (req, res, next) => {
 			})
 			.catch((err) => {
 				res.status(500);
-				res.send({message: 'Erro Interno'});
+				res.send({message: 'Erro Interno', error: err});
 			});
 	}
 	else
