@@ -5,7 +5,7 @@ var path = require('path');
 // init sequelize
 var sequelize = new Sequelize
 (
-	process.env.DATABASE_URL || database.uri,
+	process.env.DATABASE_URL,
 	database.options
 );
 

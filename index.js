@@ -16,7 +16,7 @@ if(process.env.EMAIL_API && process.env.EMAIL_DOMAIN)
 		.set('mailTransporter', require('nodemailer').createTransport(require('nodemailer-mailgun-transport')({auth:{api_key:process.env.EMAIL_API,domain:process.env.EMAIL_DOMAIN}})));
 app.use(bodyParser.urlencoded( { extended: true } ));
 app.use(bodyParser.json());
-app.use(cookieParser(process.env.COOKIE_SECRET || 'HBJHjhvgvJVhgCVHJGvGHvcHgchgc%67&^%YFgcHGcJCJH'));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // routes
 var authenticationService = require(path.join(__dirname, 'services', 'petianoAuthentication.js'));
@@ -73,8 +73,8 @@ app
 								Balance: 0.0
 							});
 				});
-			app.listen(process.env.PORT || 3000);
-			console.log("app listening at port", process.env.PORT || 3000);
+			app.listen(process.env.PORT);
+			console.log("app listening at port", process.env.PORT);
 			return;
 		});
 		return;
