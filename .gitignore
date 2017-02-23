@@ -28,6 +28,7 @@ build/Release
 public/bin
 public/js/templates.js
 
+# t
 # Dependency directories
 node_modules
 jspm_packages
