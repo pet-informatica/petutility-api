@@ -39,7 +39,7 @@ router.get('/', function(req, res) {
 			res.end();
 		}, function(err) {
 			res.status(500);
-			res.send({message: 'Erro interno', error: err});
+			res.send({message: 'Erro interno'});
 		})
 })
 
