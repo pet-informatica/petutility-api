@@ -10,12 +10,12 @@
 			</span>
 		</div>
 		<div class="input-field col s12 m6">
-			<input ng-model="user.username" type="text" name="username" required>
-			<label>Usuário</label>
+			<input id="usernameInput" ng-model="user.username" type="text" name="username" required>
+			<label for="usernameInput" >Usuário</label>
 		</div>
 		<div class="input-field col s12 m6">
-			<input ng-model="user.password" type="password" name="password" required>
-			<label>Senha</label>
+			<input id="passwordInput" ng-model="user.password" type="password" name="password" required>
+			<label for="passwordInput" >Senha</label>
 		</div>
 
 		<div class="row">
@@ -24,7 +24,7 @@
 			</div>
 
 			<div class="col s6">
-				<button ng-click="login(user)" type="submit" class="btn-flat right"><i class="material-icons right">send</i>Logar</button>
+				<button id="loginButton" ng-click="login(user)" type="submit" class="btn-flat right"><i class="material-icons right">send</i>Logar</button>
 			</div>
 		</div>
 		<div class="row">
