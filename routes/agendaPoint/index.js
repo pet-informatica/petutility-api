@@ -2,8 +2,7 @@ var path = require('path');
 var app = require(path.join(__dirname, '../../index')).app;
 var router = require('express').Router();
 
-
-router.delete('/:agendaPointId/delete', function(req, res) {
+router.delete('/:agendaPointId', function(req, res) {
 	app.get('models')
 		.AgendaPoint
 		.destroy({where: {Id: req.params.agendaPointId}})
@@ -16,7 +15,7 @@ router.delete('/:agendaPointId/delete', function(req, res) {
 		});
 });
 
-router.post('/create', function(req, res) {
+router.post('/', function(req, res) {
 	if(!req.body.Title)
 		return res.status(403).send('Título exigido');
 	req.body.PETianoId = req.user.Id;
@@ -31,21 +30,9 @@ router.post('/create', function(req, res) {
 			res.status(500);
 			res.send({message: 'Erro interno'});
 		});
-})
+});
 
-router.get('/users', function(req, res) {
-	app.get('models')
-		.AgendaPoint
-		.findAll({where: {PETianoId: req.user.Id, Status: 1}})
-		.then((result) => {
-			res.json(result).end();
-		})
-		.catch((err) => {
-			res.status(500).send('Erro interno');
-		})
-})
-
-router.post('/:agendaPointId/update', function(req, res) {
+router.put('/:agendaPointId', function(req, res) {
 	if(req.body.Title && req.body.Title === '')
 	{
 		res.status(403);
