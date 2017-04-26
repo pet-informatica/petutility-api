@@ -9,19 +9,17 @@ router.get('/', function(req, res) {
 		.findAll({
 			where:{
 				start:{
-					$between: [req.query.s, req.query.e]
+					$between: [req.query.s||Date.now, req.query.e||Date.now]
 				}
 			}
 		})
 		.then(function(result) {
-				res.send(result);
-			}
-		)
+			res.send(result);
+		})
 		.catch(function(result) {
-				res.status(500);
-				res.send('Internal server error');
-			}
-		);
+			res.status(500);
+			res.send('Internal server error');
+		});
 });
 
 router.post('/', function(req, res) {
@@ -63,14 +61,14 @@ router.put('/:eventId', function(req, res) {
 router.delete('/:eventId', function(req, res) {
 	Event
 		.destroy({
-			where: {Id: req.query.Id}
+			where: {Id: req.params.eventId}
 		})
 		.then(function(result) {
 			res.status(200).end();
 		})
 		.catch(function(result) {
-				res.status(500);
-				res.send('Internal server error');
+			res.status(500);
+			res.send('Internal server error');
 		});
 });
 
