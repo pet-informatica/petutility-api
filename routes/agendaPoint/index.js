@@ -1,10 +1,10 @@
-var path = require('path');
-var app = require(path.join(__dirname, '../../index')).app;
-var router = require('express').Router();
+const path = require('path');
+const app = require(path.join(__dirname, '../../index')).app;
+const router = require('express').Router();
+const AgendaPoint = app.get('models').AgendaPoint;
 
 router.delete('/:agendaPointId', function(req, res) {
-	app.get('models')
-		.AgendaPoint
+	AgendaPoint
 		.destroy({where: {Id: req.params.agendaPointId}})
 		.then(function(data) {
 			res.end();
@@ -19,8 +19,7 @@ router.post('/', function(req, res) {
 	if(!req.body.Title)
 		return res.status(403).send('Título exigido');
 	req.body.PETianoId = req.user.Id;
-	app.get('models')
-		.AgendaPoint
+	AgendaPoint
 		.create(req.body)
 		.then(function(data) {
 			res.json(data.toJSON());
@@ -38,11 +37,8 @@ router.put('/:agendaPointId', function(req, res) {
 		res.status(403);
 		return res.send({message: 'Título exigido'});
 	}
-	app.get('models')
-		.AgendaPoint
-		.update(
-			req.body,
-			{where: {Id: req.params.agendaPointId}, returning: true})
+	AgendaPoint
+		.update(req.body, {where: {Id: req.params.agendaPointId}, returning: true})
 		.then((data) => {
 			res.json(data[1][0].toJSON());
 			return res.end();

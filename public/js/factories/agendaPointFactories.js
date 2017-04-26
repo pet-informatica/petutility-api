@@ -1,6 +1,6 @@
 angular
 	.module('AgendaPoint')
-	.factory('AgendaPointAPI', function($resource, Request) {
+	.factory('AgendaPointAPI', function($resource) {
 		var API = $resource('/api/agendaPoint/:AgendaPointId', {}, {
 			'update': {
 				method: 'PUT'
@@ -14,7 +14,8 @@ angular
 						return done && done(null, data);
 					}, function(err) {
 						return done && done(err);
-					});
+					}
+				);
 			},
 			addAgendaPoint: (title, description, petianoId, recordOfMeetingId, status, done) => {
 				API.create({Title: title, Description: description, PETianoId: petianoId, Status: status, RecordOfMeetingId: recordOfMeetingId},
@@ -22,7 +23,8 @@ angular
 						return done && done(null, data);
 					}, function(err) {
 						return done && done(err);
-					});
+					}
+				);
 			},
 			updateAgendaPoint: (agendaPointId, title, description, done) => {
 				API.update({AgendaPointId: agendaPointId}, {Title: title, Description: description},
@@ -30,7 +32,8 @@ angular
 						return done && done(null, data);
 					}, function(err) {
 						return done && done(err);
-					})
+					}
+				);
 			},
 			changeStatus: (agendaPointId, status, done) => {
 				API.update({AgendaPointId: agendaPointId}, {Status: status},
@@ -38,7 +41,8 @@ angular
 						return done && done(null, data);
 					}, function(err) {
 						return done && done(err);
-					})
+					}
+				);
 			}
 		};
 
