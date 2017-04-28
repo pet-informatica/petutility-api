@@ -1,7 +1,7 @@
-var path = require('path');
-var app = require(path.join(__dirname, '../../index')).app;
-var router = require('express').Router();
-var Idea = app.get('models').Idea;
+const path = require('path');
+const app = require(path.join(__dirname, '../../index')).app;
+const router = require('express').Router();
+const Idea = app.get('models').Idea;
 
 router.get('/', function(req, res) {
 	Idea
