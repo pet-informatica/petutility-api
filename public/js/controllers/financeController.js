@@ -5,6 +5,7 @@ angular
 		$scope.payments = [];
 		$scope.PETianosList = [];
 		$scope.penalties = [];
+		$scope.spending = {};
 
 		var monthNames = {'1': 'Janeiro', '2': 'Fevereiro', '3': 'Março', '4': 'Abril', '5': 'Maio',
 							'6': 'Junho', '7': 'Julho', '8': 'Agosto', '9': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'};
@@ -492,11 +493,14 @@ angular
 		//spending functions
 
 		$scope.createSpending = function(value, date, description) {
+			date = $('#spendingDate').val();
+			date = date.split('/');
+			console.log(date);
 			var status = ($scope.isPigpetAccount ? 1 : 2);
 			var spending = {
 				Description: description,
 				Value: value,
-				Date: date,
+				Date: new Date(date[2], date[1], date[0]),
 				Status: status
 			}
 			SpendingAPI.createSpending(spending, function(done, data) {
@@ -508,7 +512,7 @@ angular
 			}, function(err) {
 				console.log("error in create spending");
 			})
-		}
+		};
 
 		var deleteSpendingFromScope = function(spending) {
 			for(var index = 0; index < $scope.spendings.length; index+=1) {
@@ -543,9 +547,9 @@ angular
 				acceptSpendingScope(id);
 				$scope.pigPetBalance = data.pigpet.Balance;
 			}, function(err) {
-				console.log("error in acceptSpending");
-			})
-		}
+				console.log("error in accept spending");
+			});
+		};
 
 		var acceptSpendingScope = function(id) {
 			for(var index = 0; index < $scope.spendings.length; index+=1) {
