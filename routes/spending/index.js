@@ -122,7 +122,8 @@ router.delete('/:spendingId', function(req, res) {
 		.then(function(data) {
 			if(spending.Status == 1) {
 				var pigpet;
-				PigPET.findAll()
+				PigPET
+					.findAll()
 					.then(function(p) {
 						pigpet = p[0];
 						pigpet.set('Balance', parseFloat(pigpet.Balance) + parseFloat(spending.Value));

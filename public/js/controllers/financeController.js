@@ -49,8 +49,8 @@ angular
 
 		$scope.filterPayments = function() {
 			$scope.payments = [];
-			for(var index = 0; index < $scope.dataset.length; index+=1) {
-				var p = $scope.dataset[index];
+			for(var i = 0; i < $scope.dataset.length; ++i) {
+				var p = $scope.dataset[i];
 				if(status[p.Status]) {
 					p = filterSolePayment(p);
 					$scope.payments.push(p);
@@ -150,11 +150,7 @@ angular
 		//on load functions
 
 		var loadPayments = function(isPigPet) {
-			if(isPigPet) {
-				$scope.getPendingPaymentsPigPet();
-			} else {
-				$scope.getPayments();
-			}
+			$scope.getPayments();
 		}
 
 		var loadPenalties = function(isPigPet) {
@@ -245,47 +241,47 @@ angular
 
 		$scope.getPayments = function() {
 			PaymentAPI.getPayments((err, data) => {
-				if(err)
+				if(err){
 					$scope.errMsg = err.status + ' - ' + err.data.message;
-				else {
+				} else {
 					$scope.errMsg = null;
 					$scope.dataset = data;
 					$scope.filterPayments();
 				}
 			});
-		}
+		};
 
-		$scope.createPayment = function(value, date, notes, instrument, photo) {
-			var type = $("#paymenttype").val();
+		$scope.createPayment = function(payment) {
+			var date = $('#paymentdate').val();
+			date = date.split('/');
+			date = new Date(date[2], date[1], date[0]);
 			var pay = {
-				Type: type,
-				Value: value,
+				Type: payment.type,
+				Value: payment.value,
 				Date: date,
 				Status: 3,
-				Notes: notes,
-				Instrument: instrument,
+				Notes: payment.notes,
+				Instrument: payment.instrument,
 				PETianoId: UserService.user.Id,
-				Photo: photo
+				Photo: payment.photo
 			};
 			Upload.upload({
-				url: '/api/payment/createPayment',
+				url: '/api/payment/',
+				method: 'POST',
 				data: pay
 			})
 			.then(function(data) {
 				var p = filterSolePayment(data.data);
 				$scope.payments.push(p);
 			}, function(err) {
-				console.log("error in create payment");
 				console.log(err);
 			}, function(evt) {
-				console.log("fazendo upload");
+				// console.log("fazendo upload");
 			});
 		};
 
 		$scope.acceptPayment = function(id) {
-			var pay = {
-				Id: id
-			}
+			var pay = {Id: id};
 			PaymentAPI.acceptPayment(pay, function(done, data) {
 				var p = filterSolePayment(data.payment);
 				updatePaymentScope(data.payment);
@@ -295,17 +291,18 @@ angular
 			})
 		}
 
-		$scope.updatePayment = function() {
-			var type = $("#updatepaymenttype").val();
-			var pay = $scope.paymentToUpdate;
-			if(type != "")
-				pay.Type = type;
+		$scope.updatePayment = function(payment) {
+			var date = $('#updatepaymentdate').val();
+			date = date.split('/');
+			date = new Date(date[2], date[1], date[0]);
+			payment.Date = date;
 			Upload.upload({
-				url: '/api/payment/updatePayment',
-				data: pay
+				url: '/api/payment/'+payment.Id,
+				method: 'PUT',
+				data: payment
 			})
 			.then(function(data) {
-				updatePaymentScope(pay);
+				updatePaymentScope(payment);
 			}, function(err) {
 				console.log("error in create payment");
 			}, function(evt) {
@@ -357,19 +354,6 @@ angular
 				$scope.pigPetBalance = data.Balance;
 			}, function(err) {
 				console.log("error in update pigpet balance");
-			});
-		}
-
-		$scope.getPendingPaymentsPigPet =	function() {
-			PaymentAPI.getPendingPaymentsPigPet((err, data) => {
-				if(err) {
-					$scope.errMsg = err.status + ' - ' + err.data;
-				}
-				else {
-					$scope.errMsg = null;
-					$scope.dataset = data;
-					$scope.filterPayments();
-				}
 			});
 		}
 
@@ -670,4 +654,5 @@ angular
 			loadPigPet();
 			$('select').material_select();
 		}, 1000);
-	});
+	}
+);

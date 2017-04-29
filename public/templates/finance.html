@@ -160,7 +160,7 @@
 					<input type="number" placeholder="Valor" class="validate" ng-model="payment.value">
 				</div>
 				<div class="col s6">
-					<select id="paymenttype">
+					<select ng-model="payment.type">
 						<option value="" disabled selected>Selecione o tipo de pagamento</option>
 			      <option value="1">Multa</option>
 			      <option value="2">PigPET</option>
@@ -183,7 +183,7 @@
 				    <input
 				    	type="file"
 				    	ngf-select
-				    	ng-model="payment.Photo"
+				    	ng-model="payment.photo"
 				    	name="Photo"
 				    	ngf-pattern="image/*"
 				    	accept="image/*"
@@ -196,13 +196,13 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="payment.date">
+					<input id="paymentdate" type="date" class="datepicker" placeholder="Data" ng-model="payment.date">
 				</div>
 			</div>
 			<input type="text" placeholder="Observações" class="validate" ng-model="payment.notes">
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPayment(payment.value, payment.date, payment.notes, payment.instrument, payment.Photo)">Adicionar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPayment(payment)">Adicionar</a>
     </div>
   </div>
 
@@ -363,7 +363,7 @@
 					<input type="number" placeholder="Valor" class="validate" ng-model="paymentToUpdate.Value">
 				</div>
 				<div class="col s6">
-					<select id="updatepaymenttype">
+					<select ng-model="paymentToUpdate.Type">
 						<option value="" disabled>Selecione o tipo de pagamento</option>
 			      <option value="1">Multa</option>
 			      <option value="2">PigPET</option>
@@ -373,7 +373,7 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<select id="paymentinstrument" ng-model="paymentToUpdate.Instrument">
+					<select ng-model="paymentToUpdate.Instrument">
 						<option value="" disabled>Selecione o tipo de pagamento</option>
 			      <option value="1">Transferência</option>
 			      <option value="2">Dinheiro</option>
@@ -399,13 +399,13 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<input class="datepicker" placeholder="Data" type="date" ng-model="paymentToUpdate.Date">
+					<input id="updatepaymentdate" class="datepicker" placeholder="Data" type="date" ng-model="paymentToUpdate.Date">
 				</div>
 			</div>
 			<input type="text" placeholder="Observações" class="validate" ng-model="paymentToUpdate.Notes">
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePayment()">Confirmar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePayment(paymentToUpdate)">Confirmar</a>
     </div>
   </div>
 
