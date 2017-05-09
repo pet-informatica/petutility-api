@@ -1,11 +1,7 @@
 angular
 	.module('AgendaPoint')
 	.factory('AgendaPointAPI', function($resource) {
-		var API = $resource('/api/agendaPoint/:AgendaPointId', {}, {
-			'update': {
-				method: 'PUT'
-			}
-		});
+		var API = $resource('/api/agendaPoint/:AgendaPointId');
 
 		return {
 			deleteAgendaPoint: (agendaPointId, done) => {

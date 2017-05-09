@@ -1,10 +1,7 @@
 angular
 	.module('Finance')
-	.factory('PaymentAPI', function(Request, UserService, $resource, $cookies) {
+	.factory('PaymentAPI', function($resource) {
 		var API = $resource('/api/payment/:paymentId', {}, {
-			'update': {
-				method: 'PUT'
-			},
 			'accept': {
 				method: 'POST',
 				url: '/api/payment/:paymentId/accept'

@@ -1,11 +1,7 @@
 angular
 	.module('Ideas')
 	.factory('IdeasAPI', function($resource) {
-			var API = $resource('/api/ideas/:ideaId', {}, {
-				'update': {
-					method: 'PUT'
-				}
-			});
+			var API = $resource('/api/ideas/:ideaId');
 
 			return {
 				getIdeas: (done) => {

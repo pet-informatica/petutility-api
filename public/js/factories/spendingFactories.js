@@ -3,9 +3,6 @@ angular
 	.factory('SpendingAPI',
 		function(Request, UserService, $resource, $cookies) {
 			var API = $resource('/api/spending/:spendingId', {}, {
-				'update': {
-					method: 'PUT'
-				},
 				'accept': {
 					method: 'POST',
 					url: 'api/spending/:spendingId/accept'

@@ -254,7 +254,12 @@ angular
 		$scope.createPayment = function(payment) {
 			var date = $('#paymentdate').val();
 			date = date.split('/');
-			date = new Date(date[2], date[1], date[0]);
+			if(date.length!==3) {
+				console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var pay = {
 				Type: payment.type,
 				Value: payment.value,
@@ -294,7 +299,12 @@ angular
 		$scope.updatePayment = function(payment) {
 			var date = $('#updatepaymentdate').val();
 			date = date.split('/');
-			date = new Date(date[2], date[1], date[0]);
+			if(date.length!==3) {
+				console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			payment.Date = date;
 			Upload.upload({
 				url: '/api/payment/'+payment.Id,
@@ -306,7 +316,7 @@ angular
 			}, function(err) {
 				console.log("error in create payment");
 			}, function(evt) {
-				console.log("fazendo upload");
+				// console.log("fazendo upload");
 			});
 		}
 
@@ -333,11 +343,11 @@ angular
 
 		$scope.getPigPetBalance = function() {
 			PigpetAPI.getPigPetBalance((err, data) => {
-				if(err)
+				if(err) {
 					$scope.errMsg = err.status + ' - ' + err.data.message;
-				else {
+				} else {
 					$scope.errMsg = null;
-					$scope.pigPetBalance = data.Balance;
+					$scope.pigPetBalance = (data.Balance);
 				}
 			});
 		}
@@ -351,7 +361,7 @@ angular
 				reason: justification
 			}
 			PigpetAPI.updatePigPetBalance(parameters, function(err, data) {
-				$scope.pigPetBalance = data.Balance;
+				$scope.pigPetBalance = (data.Balance);
 			}, function(err) {
 				console.log("error in update pigpet balance");
 			});
@@ -479,12 +489,17 @@ angular
 		$scope.createSpending = function(value, date, description) {
 			date = $('#spendingDate').val();
 			date = date.split('/');
-			console.log(date);
+			if(date.length!==3) {
+				console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var status = ($scope.isPigpetAccount ? 1 : 2);
 			var spending = {
 				Description: description,
 				Value: value,
-				Date: new Date(date[2], date[1], date[0]),
+				Date: date,
 				Status: status
 			}
 			SpendingAPI.createSpending(spending, function(done, data) {
@@ -561,6 +576,14 @@ angular
 		}
 
 		$scope.updateSpending = function(value, date, description) {
+			date = $('#updateSpendingDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var spending = {
 				Id: $scope.spendingToUpdate,
 				Description: description,
@@ -578,9 +601,11 @@ angular
 		//pocket functions
 
 		$scope.editPocketId = -1;
+		$scope.pocket = {};
 
-		$scope.editPocketOpenModal = function(id) {
-			$scope.editPocketId = id;
+		$scope.editPocketOpenModal = function(pocket) {
+			$scope.editPocketId = pocket.Id;
+			$scope.pocket = pocket;
 			$('#editPocketModal').openModal();
 		}
 
@@ -590,7 +615,14 @@ angular
 		}
 
 		$scope.createPocket = function(month, year, date) {
-			date = makeValidDate(date);
+			date = $('#pocketDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var pocket = {
 				Month: month,
 				Year: year,
@@ -614,6 +646,14 @@ angular
 		}
 
 		$scope.updatePocket = function(month, year, date) {
+			date = $('#updatePocketDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var pocket = {
 				Id: $scope.editPocketId,
 				Month: month,
