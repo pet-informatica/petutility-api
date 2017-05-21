@@ -1,47 +1,43 @@
-var path = require('path');
-var app = require(path.join(__dirname, '../../index')).app;
-var router = require('express').Router();
-var parallel = require('async/parallel');
-var htmlPdf = require('html-pdf');
-var nodemailer = require('nodemailer');
-var sequelize = require('sequelize');
+const path = require('path');
+const app = require(path.join(__dirname, '../../index')).app;
+const router = require('express').Router();
+const parallel = require('async/parallel');
+const htmlPdf = require('html-pdf');
+const nodemailer = require('nodemailer');
+const sequelize = require('sequelize');
+const RecordOfMeeting = app.get('models').RecordOfMeeting;
 
 router.get('/search', function(req, res) {
 	var year = parseInt(req.query.year);
 	if(!year)
 		return res.status(403).send('Campo de ano necessário');
-	var dateA = new Date(year, 0, 1, 0, 0, 0, 0),
-		dateB = new Date(year+1, 0, 1, 0, 0, 0, 0);
-	app
-		.get('models')
-		.RecordOfMeeting
-		.findAll({
-			attributes: ['Id', 'Date'],
-			where: {
-				Date: {
-					$and: {
-						$gte: dateA,
-						$lt: dateB
-					}
+	var query = {
+		attributes: ['Id', 'Date', 'Status'],
+		where: {
+			Date: {
+				$and: {
+					$gte: new Date(year, 0, 1, 0, 0, 0, 0),
+					$lt: new Date(year+1, 0, 1, 0, 0, 0, 0)
 				}
 			}
-		})
+		}
+	};
+	RecordOfMeeting
+		.findAll(query)
 		.then((result) => {
 			var ret = [];
 			for(var i = 0; i < result.length; ++i)
 				ret.push(result[i].toJSON());
 			ret.reverse();
-			res.json(ret).end();
+			res.status(200).json(ret);
 		})
 		.catch((err) => {
-			res.status(500).send('Erro interno');
+			res.status(500).json({message: err.message});
 		});
 });
 
 router.get('/open', function(req, res) {
-	app
-		.get('models')
-		.RecordOfMeeting
+	RecordOfMeeting
 		.count({
 			where: {Status: 1}
 		})
@@ -49,171 +45,134 @@ router.get('/open', function(req, res) {
 			res.send({open: (result === 0)});
 		})
 		.catch(function(err) {
-			res.status(500);
-			return res.send({message: 'Erro interno'});
-		})
-});
-
-router.get('/:recordOfMeetingId', function(req, res)
-{
-	app.get('models')
-		.RecordOfMeeting
-		.findById(req.params.recordOfMeetingId,
-			{
-				include: [
-					{model: app.get('models').PETiano, as: 'Ateiro'},
-					{model: app.get('models').PETiano, as: 'President'},
-					{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-					{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-						{model: app.get('models').PETiano, as: 'PETiano'}
-					]}
-				]
-			}
-		)
-		.then(function(result)
-		{
-			res.json(result);
-		})
-		.catch(function(result) {
-				res.status(500);
-				return res.send('Internal server error');
+			res.status(500).json({message: err.message});
 		});
 });
 
-router.get('/', function(req, res)
-{
-	app
-		.get('models')
-		.RecordOfMeeting
-		.findOne(
-			{
-				include: [
-					{model: app.get('models').PETiano, as: 'Ateiro'},
-					{model: app.get('models').PETiano, as: 'President'},
-					{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-					{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-						{model: app.get('models').PETiano, as: 'PETiano'}
-					]}
-				],
-				order: [['Id', 'DESC']]
-			}
-		)
-		.then(function(result)
-			{
-				return res.json(result.toJSON());
-			}
-		)
-		.catch(function(result)
-			{
-				res.status(500);
-				return res.send('Internal server error');
-			}
-		);
+router.get('/:recordOfMeetingId', function(req, res) {
+	RecordOfMeeting
+		.findById(req.params.recordOfMeetingId, {
+			include: [
+				{model: app.get('models').PETiano, as: 'Ateiro'},
+				{model: app.get('models').PETiano, as: 'President'},
+				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
+				{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
+					{model: app.get('models').PETiano, as: 'PETiano'}
+				]}
+			]
+		})
+		.then(function(result) {
+			res.json(result);
+		})
+		.catch(function(err) {
+			res.status(500).json({message: err.message});
+		});
+});
+
+router.get('/', function(req, res) {
+	RecordOfMeeting
+		.findOne({
+			include: [
+				{model: app.get('models').PETiano, as: 'Ateiro'},
+				{model: app.get('models').PETiano, as: 'President'},
+				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
+				{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
+					{model: app.get('models').PETiano, as: 'PETiano'}
+				]}
+			],
+			order: [['Id', 'DESC']]
+		})
+		.then(function(result) {
+			res.json(result.toJSON());
+		})
+		.catch(function(result) {
+			res.status(500).send('Internal server error');
+		});
 });
 
 router.post('/updateAteiroOrPresident', function(req, res) {
-	app
-		.get('models')
-		.RecordOfMeeting
+	RecordOfMeeting
 		.update({AteiroId: req.body.AteiroId, PresidentId: req.body.PresidentId}, {where: {Id: req.body.Id}})
 		.then((result) => {
 			if(!result[0])
-			{
-				res.status(500);
-				return res.send({message: 'Erro interno'});
-			}
-			return res.end();
+				res.status(500).send({message: 'Erro interno'});
+			else
+				res.end();
 		})
 		.catch((err) => {
-			res.status(500);
-			return res.send({message: 'Erro interno'});
+			res.status(500).send({message: 'Erro interno'});
 		});
 });
 
 router.post('/save/:recordOfMeetingId', function(req, res) {
-	app
-		.get('models')
-		.RecordOfMeeting
-		.update(
-			{Status: 2},
-			{
-				where: {Id: req.params.recordOfMeetingId, Status: 1}
-			})
+	RecordOfMeeting
+		.update({Status: 2}, {
+			where: {Id: req.params.recordOfMeetingId, Status: 1}
+		})
 		.then((result) => {
-			if(result[0])
-			{
-					res.end();
-					app
-						.get('models')
-						.RecordOfMeeting
-						.findById(req.params.recordOfMeetingId, {
-							include: [
-								{model: app.get('models').PETiano, as: 'Ateiro'},
-								{model: app.get('models').PETiano, as: 'President'},
-								{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-								{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-									{model: app.get('models').PETiano, as: 'PETiano'}
-								]}
-							]
-						})
-						.then((result)=>{
-							var transp = app.get('mailTransporter')
-							if(transp && process.env.EMAIL_DESTINY
-								&& process.env.EMAIL)
-							{
-								var html = app.get('recordOfMeetingRender')(result.toJSON());
-								htmlPdf.create(html, {format: 'Letter'}).toBuffer((err, pdfStream) => {
-										transp
-											.sendMail({
-												from: '"PETUtility" <' + process.env.EMAIL + '>',
-												to: process.env.EMAIL_DESTINY,
-												subject: 'Atas PETUtility',
-												text: 'Ata referente ao dia ' + result.Date.toLocaleDateString('en-GB') + '.',
-												attachments: [
-													{
-														filename: (result.Date.toLocaleDateString('en-GB') + '.pdf'),
-														content: pdfStream,
-														contentType: 'application/pdf'
-													}
-												]
-											}, function(err, info) {
-												if(err)
-													console.log(err);
-											});
-									});
-							}
-							var penaltys = [];
-							result.AbsentsOrLates.forEach((i) => {
-								if(!i.IsJustified)
-									penaltys.push({
-										Value: 15.0,
-										Date: result.Date,
-										PenaltyJustification: (i.Type == 1 ? 'Ausência não justificada' : 'Atraso não justificado') + ' em ' + result.Date.toLocaleDateString('en-GB') + '.',
-										PETianoId: i.PETianoId
-									});
-							});
-							app
-								.get('models')
-								.Penalty
-								.bulkCreate(penaltys);
+			if(result[0]) {
+				res.end();
+				RecordOfMeeting
+					.findById(req.params.recordOfMeetingId, {
+						include: [
+							{model: app.get('models').PETiano, as: 'Ateiro'},
+							{model: app.get('models').PETiano, as: 'President'},
+							{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
+							{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
+								{model: app.get('models').PETiano, as: 'PETiano'}
+							]}
+						]
+					})
+					.then((result) => {
+						var transp = app.get('mailTransporter');
+						if(transp && process.env.EMAIL_DESTINY && process.env.EMAIL) {
+							var html = app.get('recordOfMeetingRender')(result.toJSON());
+							htmlPdf.create(html, {format: 'Letter'}).toBuffer((err, pdfStream) => {
+									transp
+										.sendMail({
+											from: '"PETUtility" <' + process.env.EMAIL + '>',
+											to: process.env.EMAIL_DESTINY,
+											subject: 'Atas PETUtility',
+											text: 'Ata referente ao dia ' + result.Date.toLocaleDateString('en-GB') + '.',
+											attachments: [
+												{
+													filename: (result.Date.toLocaleDateString('en-GB') + '.pdf'),
+													content: pdfStream,
+													contentType: 'application/pdf'
+												}
+											]
+										}, function(err, info) {
+											if(err)
+												console.log(err);
+										});
+								});
+						}
+						var penaltys = [];
+						result.AbsentsOrLates.forEach((i) => {
+							if(!i.IsJustified)
+								penaltys.push({
+									Value: 15.0,
+									Date: result.Date,
+									PenaltyJustification: (i.Type == 1 ? 'Ausência não justificada' : 'Atraso não justificado') + ' em ' + result.Date.toLocaleDateString('en-GB') + '.',
+									PETianoId: i.PETianoId
+								});
 						});
-			}
-			else
-			{
-				res.status(403);
-				res.send({message: 'Nada a alterar'});
+						app
+							.get('models')
+							.Penalty
+							.bulkCreate(penaltys);
+					});
+			} else {
+				res.status(403).json({message: 'Nada a alterar'});
 			}
 		})
 		.catch((err) => {
-			res.status(500);
-			return res.send({message: 'Erro interno'});
+			res.status(500).json({message: err.message});
 		});
 });
 
 router.get('/:id/download', (req, res) => {
-	app
-		.get('models')
-		.RecordOfMeeting
+	RecordOfMeeting
 		.findOne({
 			include: [
 				{model: app.get('models').PETiano, as: 'Ateiro'},
@@ -256,25 +215,19 @@ router.get('/:id/download', (req, res) => {
 });
 
 router.post('/', function(req, res) {
-	app
-		.get('models')
-		.RecordOfMeeting
-		.findOne(
-			{
-				include: [
-					{model: app.get('models').PETiano, as: 'Ateiro'},
-					{model: app.get('models').PETiano, as: 'President'},
-					{model: app.get('models').AgendaPoint, as: 'AgendaPoints'}
-				],
-				order: [['Id', 'DESC']]
-			}
-		)
+	RecordOfMeeting
+		.findOne({
+			include: [
+				{model: app.get('models').PETiano, as: 'Ateiro'},
+				{model: app.get('models').PETiano, as: 'President'},
+				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'}
+			],
+			order: [['Id', 'DESC']]
+		})
 		.then(function(result) {
 			if(result.Status != 2)
 				 return res.status(403).json({message: 'Ata ainda aberta.'});
-			app
-				.get('models')
-				.RecordOfMeeting
+			RecordOfMeeting
 				.create({
 					Status: 1,
 					AteiroId: result.AteiroId,

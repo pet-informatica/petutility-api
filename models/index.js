@@ -3,11 +3,7 @@ var database = require('config').get('database');
 var path = require('path');
 
 // init sequelize
-var sequelize = new Sequelize
-(
-	process.env.DATABASE_URL,
-	database.options
-);
+var sequelize = new Sequelize(process.env.DATABASE_URL, database.options);
 
 // load models
 var models =
@@ -21,15 +17,13 @@ var models =
 	'Pocket',
 	'Spending',
 	'Event',
-	// 'Feedback',
-	// 'Absents',
-	// 'Historic',
 	'Candidato',
 	'Selecao',
 	'Etapa',
 	'PigPET',
 	'Penalty'
 ];
+
 models.forEach(function(model)
 {
 	module.exports[model] = sequelize.import(path.join(__dirname, model));
@@ -49,10 +43,6 @@ models.forEach(function(model)
 	m.PETiano.hasMany(m.Payment, {as: {plural: 'Payments', singular: 'Payment'}, foreignKey: 'PETianoId'});
 	m.Spending.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.Event.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
-	// m.Feedback.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
-	// m.HistoricContent.belongsTo(m.Historic, {as: 'Historic', foreignKey: 'HistoricId'});
-	// m.Absents.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
-	// m.Absents.belongsTo(m.PETiano, {as: 'Historic', foreignKey: 'HistoricId'});
 	m.Selecao.hasMany(m.Etapa, {as: {plural: 'Etapas', singular: 'Etapa'}, foreignKey: 'SelecaoId'});
 	m.Selecao.hasMany(m.Candidato, {as: {plural: 'Candidatos', singular: 'Candidato'}, foreignKey: 'SelecaoId'});
 	m.Etapa.hasMany(m.Candidato, {as: {plural: 'Candidatos', singular: 'Candidato'}, foreignKey: 'EtapaId'});

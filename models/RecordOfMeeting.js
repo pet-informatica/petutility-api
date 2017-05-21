@@ -16,6 +16,8 @@ module.exports = function(sequelize, DataTypes) {
 		Status: {
 			type: DataTypes.INTEGER,
 			validate: {
+				// 1 === open
+				// 2 === closed
 				isIn: [['1','2']]
 			},
 			allowNull: false

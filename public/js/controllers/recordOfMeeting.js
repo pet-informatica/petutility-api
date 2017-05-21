@@ -1,36 +1,27 @@
 angular
 	.module('RecordOfMeeting')
 	.controller('RecordOfMeetingController',
-		function($scope,
-					$window,
-					$timeout,
-					$http,
-					RecordOfMeetingAPI,
-					AgendaPointAPI,
-					AbsentOrLateAPI,
-					PETianoService) {
-			$http({
-				method: 'GET',
-				url: '/api/recordOfMeeting/open'
-			}).then((result) => {
-				$scope.canOpen = result.data.open;
-			}, (result) => {
-				$scope.canOpen = true;
-			});
-
+		function($scope, $window, $timeout, $http, RecordOfMeetingAPI, AgendaPointAPI, AbsentOrLateAPI, PETianoService) {
+			$scope.canOpen = false;
 			$scope.searchYears = Array.apply(null, Array(100)).map(function (_, i) {return ((new Date()).getFullYear() - i);});
+			$scope.PETianosList = {};
+			$scope.recordOfMeeting = {};
 
-			$scope.PETianosList = { };
-			PETianoService
-				.getAllPETianos((err, data) => {
+			$scope.init = function() {
+				$http({
+					method: 'GET',
+					url: '/api/recordOfMeeting/open'
+				}).then((result) => {
+					$scope.canOpen = result.data.open;
+				});
+
+				PETianoService.getAllPETianos((err, data) => {
 					if(err)
 						return;
 					$scope.PETianosList = data;
 				});
 
-			$scope.recordOfMeeting = {};
-			RecordOfMeetingAPI
-				.getLastRecordOfMeeting((err, data) => {
+				RecordOfMeetingAPI.getLastRecordOfMeeting((err, data) => {
 					if(err)
 						return;
 					data.Date = new Date(data.Date);
@@ -41,7 +32,9 @@ angular
 						$('.tooltipped').tooltip();
 						$scope.searchRecordOfMeeting();
 					}, 500, false);
-				})
+				});
+			};
+			$scope.init();
 
 			$scope
 				.deleteAgendaPoint = function(agendaPoint) {
