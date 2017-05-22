@@ -2,18 +2,24 @@ const path = require('path');
 const app = require(path.join(__dirname, '../../index')).app;
 const router = require('express').Router();
 const parallel = require('async/parallel');
+const each = require('async/each');
 const htmlPdf = require('html-pdf');
 const nodemailer = require('nodemailer');
 const sequelize = require('sequelize');
 const RecordOfMeeting = app.get('models').RecordOfMeeting;
+const AgendaPoint = app.get('models').AgendaPoint;
+const Penalty = app.get('models').Penalty;
 
-router.get('/search', function(req, res) {
-	var year = parseInt(req.query.year);
-	if(!year)
-		return res.status(403).send('Campo de ano necessário');
+var locker = false;
+
+router.get('/', function(req, res) {
 	var query = {
 		attributes: ['Id', 'Date', 'Status'],
-		where: {
+		order: [['Id', 'DESC']]
+	};
+	if(req.query.yer) {
+		var year = parseInt(req.query.year);
+		query.where = {
 			Date: {
 				$and: {
 					$gte: new Date(year, 0, 1, 0, 0, 0, 0),
@@ -21,7 +27,7 @@ router.get('/search', function(req, res) {
 				}
 			}
 		}
-	};
+	}
 	RecordOfMeeting
 		.findAll(query)
 		.then((result) => {
@@ -32,19 +38,6 @@ router.get('/search', function(req, res) {
 			res.status(200).json(ret);
 		})
 		.catch((err) => {
-			res.status(500).json({message: err.message});
-		});
-});
-
-router.get('/open', function(req, res) {
-	RecordOfMeeting
-		.count({
-			where: {Status: 1}
-		})
-		.then(function(result) {
-			res.send({open: (result === 0)});
-		})
-		.catch(function(err) {
 			res.status(500).json({message: err.message});
 		});
 });
@@ -62,14 +55,14 @@ router.get('/:recordOfMeetingId', function(req, res) {
 			]
 		})
 		.then(function(result) {
-			res.json(result);
+			res.status(200).json(result);
 		})
 		.catch(function(err) {
 			res.status(500).json({message: err.message});
 		});
 });
 
-router.get('/', function(req, res) {
+router.get('/:recordOfMeetingId/download', (req, res) => {
 	RecordOfMeeting
 		.findOne({
 			include: [
@@ -80,35 +73,61 @@ router.get('/', function(req, res) {
 					{model: app.get('models').PETiano, as: 'PETiano'}
 				]}
 			],
-			order: [['Id', 'DESC']]
+			where: {
+				Status: 2,
+				Id: req.params.recordOfMeetingId
+			}
 		})
-		.then(function(result) {
-			res.json(result.toJSON());
+		.then((result) => {
+			if(!result) {
+				res.status(404).json({message: 'Ata inexistente ou ainda não salva'});
+				return;
+			}
+			var html = app.get('recordOfMeetingRender')(result.toJSON());
+			htmlPdf.create(html, {format: 'Letter', timeout: 60000}).toStream((err, result) => {
+				if(err) {
+					console.log(err);
+					res.status(500).json({message: 'Erro interno'});
+				} else {
+					res.contentType('application/pdf');
+					result.pipe(res);
+				}
+			});
 		})
-		.catch(function(result) {
-			res.status(500).send('Internal server error');
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json({message: 'Erro interno'});
 		});
 });
 
-router.post('/updateAteiroOrPresident', function(req, res) {
+var lockefFunction = function(req, res, next) {
+	if (locker)
+		res.status(400).json({message: 'Ata bloqueada no momento'});
+	else
+		next();
+};
+
+router.put('/:recordOfMeetingId', function(req, res) {
+	var data = {
+		AteiroId: req.body.AteiroId,
+		PresidentId: req.body.PresidentId
+	};
 	RecordOfMeeting
-		.update({AteiroId: req.body.AteiroId, PresidentId: req.body.PresidentId}, {where: {Id: req.body.Id}})
+		.update(data, {where: {Id: req.params.recordOfMeetingId, Status: 1}})
 		.then((result) => {
 			if(!result[0])
-				res.status(500).send({message: 'Erro interno'});
+				res.status(404).json({message: 'Ata não encontrada'});
 			else
 				res.end();
 		})
 		.catch((err) => {
-			res.status(500).send({message: 'Erro interno'});
+			res.status(500).json({message: 'Erro interno'});
 		});
 });
 
-router.post('/save/:recordOfMeetingId', function(req, res) {
+router.post('/:recordOfMeetingId', function(req, res) {
 	RecordOfMeeting
-		.update({Status: 2}, {
-			where: {Id: req.params.recordOfMeetingId, Status: 1}
-		})
+		.update({Status: 2}, {where: {Id: req.params.recordOfMeetingId, Status: 1}})
 		.then((result) => {
 			if(result[0]) {
 				res.end();
@@ -148,7 +167,7 @@ router.post('/save/:recordOfMeetingId', function(req, res) {
 								});
 						}
 						var penaltys = [];
-						result.AbsentsOrLates.forEach((i) => {
+						each(result.AbsentsOrLates, (i, done) => {
 							if(!i.IsJustified)
 								penaltys.push({
 									Value: 15.0,
@@ -156,11 +175,10 @@ router.post('/save/:recordOfMeetingId', function(req, res) {
 									PenaltyJustification: (i.Type == 1 ? 'Ausência não justificada' : 'Atraso não justificado') + ' em ' + result.Date.toLocaleDateString('en-GB') + '.',
 									PETianoId: i.PETianoId
 								});
-						});
-						app
-							.get('models')
-							.Penalty
-							.bulkCreate(penaltys);
+							done();
+						}, () => {
+							Penalty.bulkCreate(penaltys);
+						})
 					});
 			} else {
 				res.status(403).json({message: 'Nada a alterar'});
@@ -171,56 +189,13 @@ router.post('/save/:recordOfMeetingId', function(req, res) {
 		});
 });
 
-router.get('/:id/download', (req, res) => {
-	RecordOfMeeting
-		.findOne({
-			include: [
-				{model: app.get('models').PETiano, as: 'Ateiro'},
-				{model: app.get('models').PETiano, as: 'President'},
-				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-				{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-					{model: app.get('models').PETiano, as: 'PETiano'}
-				]}
-			],
-			where: {
-				Status: 2,
-				Id: req.params.id
-			}
-		})
-		.then((result) => {
-			if(!result)
-			{
-				res.status(404);
-				res.send('<h1>Ata inexistente ou ainda não salva</h1>');
-				return;
-			}
-			var html = app.get('recordOfMeetingRender')(result.toJSON());
-			htmlPdf.create(html, {format: 'Letter', timeout: 60000}).toStream((err, result) => {
-				if(err)
-				{
-				console.log(err);
-					res.status(500);
-					res.send('Erro interno');
-					return;
-				}
-				res.contentType('application/pdf');
-				result.pipe(res);
-			});
-		})
-		.catch((err) => {
-			res.status(500);
-			res.send('Erro interno');
-			console.log(err);
-		});
-});
-
 router.post('/', function(req, res) {
 	RecordOfMeeting
 		.findOne({
 			include: [
 				{model: app.get('models').PETiano, as: 'Ateiro'},
 				{model: app.get('models').PETiano, as: 'President'},
-				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'}
+				{model: AgendaPoint, as: 'AgendaPoints'}
 			],
 			order: [['Id', 'DESC']]
 		})
@@ -236,12 +211,12 @@ router.post('/', function(req, res) {
 					include: [
 						{model: app.get('models').PETiano, as: 'Ateiro'},
 						{model: app.get('models').PETiano, as: 'President'},
-						{model: app.get('models').AgendaPoint, as: 'AgendaPoints'}
+						{model: AgendaPoint, as: 'AgendaPoints'}
 					]
 				})
 				.then((result1) => {
 					parallel([
-						(callback) => {
+						(cb) => {
 							var toDos = [];
 							for(var i = 0; i < result.AgendaPoints.length; ++i)
 							{
@@ -254,23 +229,17 @@ router.post('/', function(req, res) {
 									Status: (agendaPoint.Status == 2) ? 2 : 3
 								});
 							}
-							app
-								.get('models')
-								.AgendaPoint
+							AgendaPoint
 								.bulkCreate(toDos, {returning: true})
 								.then((results) => {
 									for(var i = 0; i < results.length; ++i)
 										results[i] = results[i].toJSON();
-									callback(null, results);
+									cb(null, results);
 								})
-								.catch((err) => {
-									callback(err);
-								});
+								.catch(cb);
 						},
-						(callback) => {
-							app
-								.get('models')
-								.AgendaPoint
+						(cb) => {
+							AgendaPoint
 								.update({
 									RecordOfMeetingId: result1.Id,
 									Status: 4,
@@ -284,11 +253,9 @@ router.post('/', function(req, res) {
 									var results = result[1];
 									for(var i = 0; i < result[0]; ++i)
 										results[i] = result[1][i].toJSON();
-									callback(null, results);
+									cb(null, results);
 								})
-								.catch((err) => {
-									callback(err);
-								});
+								.catch(cb);
 						}
 					], (err, results) => {
 						if(err)
@@ -298,15 +265,15 @@ router.post('/', function(req, res) {
 						ret.AbsentsOrLates = [];
 						ret.Ateiro = result.Ateiro.toJSON();
 						ret.President = result.President.toJSON();
-						res.json(ret);
+						res.status(201).json(ret);
 					});
 				})
 				.catch((err) => {
-					return res.status(500).send({message: 'Erro interno'});
+					res.status(500).send({message: 'Erro interno'});
 				});
 		})
 		.catch(function(err) {
-			return res.status(500).send({message: 'Erro interno'});
+			res.status(500).send({message: 'Erro interno'});
 		});
 })
 
