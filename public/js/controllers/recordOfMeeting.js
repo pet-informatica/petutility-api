@@ -155,16 +155,15 @@ angular
 					var tDescription = agendaPoint.ServerDescription;
 					agendaPoint.ServerTitle = agendaPoint.Title;
 					agendaPoint.ServerDescription = agendaPoint.Description;
-					AgendaPointAPI.updateAgendaPoint(agendaPoint.Id, agendaPoint.Title, agendaPoint.Description,
-						(err, data) => {
-							if (err) {
-								agendaPoint.ServerTitle = tTitle;
-								agendaPoint.ServerDescription = tDescription;
-								return;
-							}
-							agendaPoint.Title = agendaPoint.ServerTitle = data.Title;
-							agendaPoint.Description = agendaPoint.ServerDescription = data.Description;
-						});
+					AgendaPointAPI.updateAgendaPoint(agendaPoint, (err, data) => {
+						if (err) {
+							agendaPoint.ServerTitle = tTitle;
+							agendaPoint.ServerDescription = tDescription;
+							return;
+						}
+						agendaPoint.Title = agendaPoint.ServerTitle = data.Title;
+						agendaPoint.Description = agendaPoint.ServerDescription = data.Description;
+					});
 				}
 			};
 

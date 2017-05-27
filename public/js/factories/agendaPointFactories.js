@@ -22,8 +22,8 @@ angular
 					}
 				);
 			},
-			updateAgendaPoint: (agendaPointId, title, description, done) => {
-				API.update({agendaPointId: agendaPointId}, {Title: title, Description: description},
+			updateAgendaPoint: (agendaPoint, done) => {
+				API.update({agendaPointId: agendaPoint.Id}, {Title: agendaPoint.Title, Description: agendaPoint.Description, RecordOfMeetingId: agendaPoint.RecordOfMeetingId},
 					function(data) {
 						return done && done(null, data);
 					}, function(err) {
