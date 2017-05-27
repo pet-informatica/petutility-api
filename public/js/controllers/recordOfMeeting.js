@@ -1,16 +1,16 @@
 angular
 	.module('RecordOfMeeting')
 	.controller('RecordOfMeetingController',
-		function($scope, $window, $timeout, $http, RecordOfMeetingAPI, AgendaPointAPI, AbsentOrLateAPI, PETianoService) {
+		function($scope, $window, $timeout, RecordOfMeetingAPI, AgendaPointAPI, AbsentOrLateAPI, PETianoService) {
 			$scope.canOpen = false;
 			$scope.searchYears = Array.apply(null, Array(100)).map(function (_, i) {return ((new Date()).getFullYear() - i);});
 			$scope.PETianosList = {};
 			$scope.recordOfMeeting = {};
+			$scope.UsersAgendaPoints = [];
 
 			$scope.init = function() {
 				PETianoService.getAllPETianos((err, data) => {
-					if(err)
-						return;
+					if (err) return;
 					$scope.PETianosList = data;
 				});
 				RecordOfMeetingAPI.query((res) => {
@@ -33,6 +33,10 @@ angular
 							}, 500, false);
 						});
 					}
+				});
+				AgendaPointAPI.getAgendaPoints((err, result) => {
+					if (err) return;
+					$scope.UsersAgendaPoints = result;
 				});
 			};
 			$scope.init();
@@ -63,7 +67,7 @@ angular
 						break;
 					}
 				}
-				if(t.idx === -1) return;
+				if (t.idx === -1) return;
 				$scope.toDeleteAgendaPoint = t;
 				$('#deleteAgendaPointModal').openModal();
 				$('#deleteModalButton').focus();
@@ -73,11 +77,10 @@ angular
 				$('#deleteAgendaPointModal').closeModal();
 				var t = $scope.toDeleteAgendaPoint;
 				$scope.recordOfMeeting.AgendaPoints.splice(t.idx, 1);
-				AgendaPointAPI
-					.deleteAgendaPoint(t.agendaPoint.Id, (err, data) => {
-						if(!err) return;
-						$scope.recordOfMeeting.AgendaPoints.splice(idx, 0, t.agendaPoint);
-					});
+				AgendaPointAPI.deleteAgendaPoint(t.agendaPoint.Id, (err, data) => {
+					if(!err) return;
+					$scope.recordOfMeeting.AgendaPoints.splice(idx, 0, t.agendaPoint);
+				});
 			};
 
 			$scope.addAgendaPoint = function() {
@@ -87,25 +90,24 @@ angular
 			};
 
 			$scope.confirmAddAgendaPoint = function() {
-				var t = {};
-				t.agendaPoint = {};
-				angular.copy($scope.toAddAgendaPoint, t.agendaPoint);
+				var agendaPoint = {};
 				$('#addAgendaPointModal').closeModal();
-				t.agendaPoint.Status = 4; //just added
-				t.agendaPoint.PETianoId = $scope.recordOfMeeting.Ateiro.Id;
-				t.agendaPoint.RecordOfMeetingId = $scope.recordOfMeeting.Id;
-				t.idx = $scope.recordOfMeeting.AgendaPoints.length;
-				$scope.recordOfMeeting.AgendaPoints.push(t.agendaPoint);
-				AgendaPointAPI
-					.addAgendaPoint(t.agendaPoint.Title, t.agendaPoint.Description, t.agendaPoint.PETianoId, t.agendaPoint.RecordOfMeetingId, t.agendaPoint.Status, (err, data) => {
-						if(err) {
-							$scope.recordOfMeeting.AgendaPoints.splice(t.idx, 1);
-						} else {
-							t.agendaPoint.Id = data.Id;
-							$scope.toAddAgendaPoint = {};
-							$('.tooltipped').tooltip();
-						}
-					});
+				agendaPoint.Title = $scope.toAddAgendaPoint.Title;
+				agendaPoint.Description = $scope.toAddAgendaPoint.Description;
+				agendaPoint.Status = 4; //just added
+				agendaPoint.PETianoId = $scope.recordOfMeeting.Ateiro.Id;
+				agendaPoint.RecordOfMeetingId = $scope.recordOfMeeting.Id;
+				var idx = $scope.recordOfMeeting.AgendaPoints.length;
+				$scope.recordOfMeeting.AgendaPoints.push(agendaPoint);
+				AgendaPointAPI.addAgendaPoint(agendaPoint, (err, data) => {
+					if (err) {
+						$scope.recordOfMeeting.AgendaPoints.splice(idx, 1);
+					} else {
+						agendaPoint.Id = data.Id;
+						$scope.toAddAgendaPoint = {};
+						$('.tooltipped').tooltip();
+					}
+				});
 			};
 
 			$scope.editAteiroAndPresident = () => {
@@ -115,19 +117,16 @@ angular
 			$scope.confirmEditeAteiroAndPresident = () => {
 				var prevAteiro = $scope.recordOfMeeting.AteiroId;
 				var prevPresident = $scope.recordOfMeeting.PresidentId;
-
 				$('#petianosModal').closeModal();
-
 				$scope.recordOfMeeting.AteiroId = $('#ateiroSelectDropdown').val();
 				$scope.recordOfMeeting.Ateiro = $scope.PETianosList[$scope.recordOfMeeting.AteiroId];
 				$scope.recordOfMeeting.PresidentId = $('#presidentSelectDropdown').val();
 				$scope.recordOfMeeting.President = $scope.PETianosList[$scope.recordOfMeeting.PresidentId];
-
 				RecordOfMeetingAPI.update({recordOfMeetingId: $scope.recordOfMeeting.Id}, {
 					AteiroId: $scope.recordOfMeeting.AteiroId,
 					PresidentId: $scope.recordOfMeeting.PresidentId
 				}, (err, data) => {
-					if(err) {
+					if (err) {
 						$scope.recordOfMeeting.AteiroId = prevAteiro;
 						$scope.recordOfMeeting.Ateiro = $scope.PETianosList[prevAteiro];
 						$scope.recordOfMeeting.PresidentId = prevPresident;
@@ -158,8 +157,7 @@ angular
 					agendaPoint.ServerDescription = agendaPoint.Description;
 					AgendaPointAPI.updateAgendaPoint(agendaPoint.Id, agendaPoint.Title, agendaPoint.Description,
 						(err, data) => {
-							if(err)
-							{
+							if (err) {
 								agendaPoint.ServerTitle = tTitle;
 								agendaPoint.ServerDescription = tDescription;
 								return;
@@ -172,24 +170,22 @@ angular
 
 			$scope.desafixarAgendaPoint = (agendaPoint) => {
 				$('.tooltipped').tooltip('remove');
-				agendaPoint.Status = 3; // outstanding;
-				AgendaPointAPI.changeStatus(agendaPoint.Id, 3, (err, data) => {
-					if(err)
-						agendaPoint.Status = 2;
-					$timeout(()=>{$('.tooltipped').tooltip();},0,true);
+				AgendaPointAPI.changeStatus(agendaPoint, 3, (err, data) => {
+					if(!err) {
+						agendaPoint.Status = 3; // outstanding;
+						$timeout(()=>{$('.tooltipped').tooltip();},0,true);
+					}
 				});
 			};
 
 			$scope.fixarAgendaPoint = (agendaPoint) => {
 				$('.tooltipped').tooltip('remove');
-				var prevStatus = agendaPoint.Status;
-				agendaPoint.Status = 2;
-				AgendaPointAPI
-					.changeStatus(agendaPoint.Id, 2, (err, data) => {
-						if(err)
-							agendaPoint.Status = prevStatus;
+				AgendaPointAPI.changeStatus(agendaPoint, 2, (err, data) => {
+					if(!err) {
+						agendaPoint.Status = 2;
 						$timeout(()=>{$('.tooltipped').tooltip();},0,true);
-					});
+					}
+				});
 			};
 
 			$scope.saveRecordOfMeeting = () => {
@@ -198,7 +194,7 @@ angular
 
 			$scope.confirmSaveRecordOfMeeting = () => {
 				$('#recordOfMeetingSavingModal').closeModal();
-				RecordOfMeetingAPI.close({recordOfMeetingId: $scope.recordOfMeeting.Id}, (data) => {
+				RecordOfMeetingAPI.close({recordOfMeetingId: $scope.recordOfMeeting.Id}, {}, (data) => {
 					$scope.recordOfMeeting.Status = 2;
 					$scope.canOpen = true;
 				}, (err) => {
@@ -217,7 +213,7 @@ angular
 						break;
 					}
 				}
-				if(t.idx1 == -1) return;
+				if (t.idx1 == -1) return;
 				$scope.deletingAbsentOrLateModal = t;
 				$('#deletingAbsentOrLateModal').openModal();
 				$('#deletingAbsentOrLateModalButton').focus();
@@ -245,8 +241,7 @@ angular
 				$('#addAbsentOrLateModal').openModal();
 			};
 
-			$scope
-			.confirmAddAbsentOrLate = () => {
+			$scope.confirmAddAbsentOrLate = () => {
 				$('#addAbsentOrLateModal').closeModal();
 				var t = $scope.addingAbsentOrLate;
 				var u = $scope.recordOfMeeting.AbsentsOrLates;
@@ -254,7 +249,7 @@ angular
 				if(!t.PETianoId) return;
 				t.inval = -1;
 				for(var i = 0; i < u.length; ++i)
-					if(u[i].PETianoId == t.PETianoId) {
+					if (u[i].PETianoId == t.PETianoId) {
 						t.inval = i;
 						t.invalPT = u[i];
 						u.splice(i, 1);
@@ -263,118 +258,97 @@ angular
 				t.idx = u.length;
 				$('.tooltipped').tooltip('remove');
 				u.push(
-					AbsentOrLateAPI
-						.save({
+					AbsentOrLateAPI.save({
 							Type: t.Type,
 							PETianoId: t.PETianoId,
 							Reason: t.Reason,
 							RecordOfMeetingId: $scope.recordOfMeeting.Id,
 							IsJustified: t.IsJustified
 						}, function(data) {
-							PETianoService
-								.getPETianoById(data.PETianoId, (err, PETiano) => {
-									if(!err)
-									{
-										u[t.idx].PETiano = PETiano;
-										$scope.addingAbsentOrLate = {};
-										$timeout(()=>{$('.tooltipped').tooltip();$('#absentOrLateSelectDropdown').val('');$('select').material_select();},0,true);
-									}
-								});
+							PETianoService.getPETianoById(data.PETianoId, (err, PETiano) => {
+								if(!err) {
+									u[t.idx].PETiano = PETiano;
+									$scope.addingAbsentOrLate = {};
+									$timeout(()=>{$('.tooltipped').tooltip();$('#absentOrLateSelectDropdown').val('');$('select').material_select();},0,true);
+								}
+							});
 						}, function(err) {
 							u.splice(t.idx, 1);
-							if(t.inval != -1 && (t.inval || t.inval == 0))
+							if (t.inval != -1 && (t.inval || t.inval == 0))
 								u.splice(t.inval, 0, t.invalPT);
 							$timeout(()=>{$('.tooltipped').tooltip();},0,true);
 						}));
 			};
 
-			$scope
-				.createRecordOfMeeting = () => {
-					$('#recordOfMeetingCreatingModal').openModal();
-				}
+			$scope.createRecordOfMeeting = () => {
+				$('#recordOfMeetingCreatingModal').openModal();
+			};
 
-			$scope
-				.confirmCreateRecordOfMeeting = () => {
-					$('#recordOfMeetingCreatingModal').closeModal();
-					RecordOfMeetingAPI.open((data) => {
-						data.Date = new Date(data.Date);
-						$scope.recordOfMeeting = data;
-						$scope.UsersAgendaPoints = [];
-						$timeout(() => {
-							$('.collapsible').collapsible({});
-							$('select').material_select();
-							$('.tooltipped').tooltip();
-						}, 500, false);
-					});
-				};
-
-			$scope
-				.openDownloadWindow = () => {
-					if($scope.recordOfMeeting.Status === 2)
-						window.open('/api/recordOfMeeting/' + $scope.recordOfMeeting.Id + '/download');
-				};
-
-			$scope
-				.openSearchModal = () => {
-					$('#searchModal').openModal();
-				};
-
-			$scope
-				.closeSearchModal = () => {
-					$('#searchModal').closeModal();
-				};
-
-			$scope;
-				.loadRecordOfMeeting = (id) => {
-					if(!id)
-						return;
-					$('#searchModal').closeModal();
-					RecordOfMeetingAPI.get({recordOfMeetingId: id}, (data) => {
-						data.Date = new Date(data.Date);
-						$scope.recordOfMeeting = data;
-						$scope.canOpen = data.Status === 1;
-						$timeout(() => {
-							$('.collapsible').collapsible({});
-							$('select').material_select();
-							$('.tooltipped').tooltip();
-						}, 1000, false);
-					});
-				}
-
-			$scope
-				.openNewAgendaPointsModal = () => {
-					$('#addNewAgendaPointModal').openModal();
-					$('ul.tabs').tabs();
-					$('.collapsible').collapsible({});
-					Materialize.updateTextFields();
-				}
-
-			$scope
-				.addNewAgendaPoint = () => {
-					$scope.toAddNewAgendaPoint.Status = 1;
-					var t = $scope.toAddNewAgendaPoint;
-					$scope.toAddNewAgendaPoint = {};
-					var tIdx = $scope.UsersAgendaPoints.length;
-					$scope.UsersAgendaPoints.push(t);
-					// TODO
-					$http({method: 'POST', url: '/api/agendaPoint/create', data: t})
-						.then((result) => {
-							t.Id = result.data.Id;
-							t.PETianoId = result.data.PETianoId;
-							Materialize.updateTextFields();
-						}, (err) => {
-							$scope.toAddNewAgendaPoint = t;
-							$scope.UsersAgendaPoints.splice(tIdx, 1);
-							Materialize.updateTextFields();
-						})
-				}
-
-				// TODO
-			$http({method: 'GET', url: 'api/agendaPoint/users'})
-				.then((result) => {
-					$scope.UsersAgendaPoints = result.data;
-				}, (err) => {
+			$scope.confirmCreateRecordOfMeeting = () => {
+				$('#recordOfMeetingCreatingModal').closeModal();
+				RecordOfMeetingAPI.open((data) => {
+					data.Date = new Date(data.Date);
+					$scope.recordOfMeeting = data;
 					$scope.UsersAgendaPoints = [];
-				})
+					$timeout(() => {
+						$('.collapsible').collapsible({});
+						$('select').material_select();
+						$('.tooltipped').tooltip();
+					}, 500, false);
+				});
+			};
+
+			$scope.openDownloadWindow = () => {
+				if($scope.recordOfMeeting.Status === 2)
+					$window.open('/api/recordOfMeeting/' + $scope.recordOfMeeting.Id + '/download');
+			};
+
+			$scope.openSearchModal = () => {
+				$('#searchModal').openModal();
+			};
+
+			$scope.closeSearchModal = () => {
+				$('#searchModal').closeModal();
+			};
+
+			$scope.loadRecordOfMeeting = (id) => {
+				if (!id) return;
+				$('#searchModal').closeModal();
+				RecordOfMeetingAPI.get({recordOfMeetingId: id}, (data) => {
+					data.Date = new Date(data.Date);
+					$scope.recordOfMeeting = data;
+					$scope.canOpen = data.Status === 1;
+					$timeout(() => {
+						$('.collapsible').collapsible({});
+						$('select').material_select();
+						$('.tooltipped').tooltip();
+					}, 1000, false);
+				});
+			};
+
+			$scope.openNewAgendaPointsModal = () => {
+				$('#addNewAgendaPointModal').openModal();
+				$('ul.tabs').tabs();
+				$('.collapsible').collapsible({});
+				Materialize.updateTextFields();
+			};
+
+			$scope.addNewAgendaPoint = () => {
+				$scope.toAddNewAgendaPoint.Status = 1;
+				var t = $scope.toAddNewAgendaPoint;
+				$scope.toAddNewAgendaPoint = {};
+				var tIdx = $scope.UsersAgendaPoints.length;
+				$scope.UsersAgendaPoints.push(t);
+				AgendaPointAPI.addAgendaPoint(t, (data) => {
+					t.Id = data.Id;
+					t.PETianoId = data.PETianoId;
+					Materialize.updateTextFields();
+				}, (err) => {
+					$scope.toAddNewAgendaPoint = t;
+					$scope.UsersAgendaPoints.splice(tIdx, 1);
+					Materialize.updateTextFields();
+				});
+			};
+
 		}
 	);

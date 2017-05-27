@@ -1,11 +1,11 @@
 angular
 	.module('AgendaPoint')
 	.factory('AgendaPointAPI', function($resource) {
-		var API = $resource('/api/agendaPoint/:AgendaPointId');
+		var API = $resource('/api/agendaPoint/:agendaPointId');
 
 		return {
 			deleteAgendaPoint: (agendaPointId, done) => {
-				API.remove({AgendaPointId: agendaPointId},
+				API.remove({agendaPointId: agendaPointId},
 					function(data) {
 						return done && done(null, data);
 					}, function(err) {
@@ -13,8 +13,8 @@ angular
 					}
 				);
 			},
-			addAgendaPoint: (title, description, petianoId, recordOfMeetingId, status, done) => {
-				API.create({Title: title, Description: description, PETianoId: petianoId, Status: status, RecordOfMeetingId: recordOfMeetingId},
+			addAgendaPoint: (agendaPoint, done) => {
+				API.save(agendaPoint,
 					function(data) {
 						return done && done(null, data);
 					}, function(err) {
@@ -23,7 +23,7 @@ angular
 				);
 			},
 			updateAgendaPoint: (agendaPointId, title, description, done) => {
-				API.update({AgendaPointId: agendaPointId}, {Title: title, Description: description},
+				API.update({agendaPointId: agendaPointId}, {Title: title, Description: description},
 					function(data) {
 						return done && done(null, data);
 					}, function(err) {
@@ -31,8 +31,17 @@ angular
 					}
 				);
 			},
-			changeStatus: (agendaPointId, status, done) => {
-				API.update({AgendaPointId: agendaPointId}, {Status: status},
+			changeStatus: (agendaPoint, status, done) => {
+				API.update({agendaPointId: agendaPoint.Id}, {Status: status, RecordOfMeetingId: agendaPoint.RecordOfMeetingId},
+					function(data) {
+						return done && done(null, data);
+					}, function(err) {
+						return done && done(err);
+					}
+				);
+			},
+			getAgendaPoints: (done) => {
+				API.query(
 					function(data) {
 						return done && done(null, data);
 					}, function(err) {

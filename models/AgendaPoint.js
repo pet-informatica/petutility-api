@@ -19,10 +19,10 @@ module.exports = function(sequelize, DataTypes) {
 		Status: {
 			type: DataTypes.INTEGER,
 			validate: {
-				// 1 === novo ponto ?
+				// 1 === ponto novo fora de ata
 				// 2 === ponto fixo
 				// 3 === ponto pendente
-				// 4 === novo ponto ?
+				// 4 === ponto novo na ata
 				isIn: [['1', '2', '3', '4']]
 			},
 			allowNull: false

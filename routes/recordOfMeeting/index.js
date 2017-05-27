@@ -9,10 +9,10 @@ const sequelize = require('sequelize');
 const RecordOfMeeting = app.get('models').RecordOfMeeting;
 const AgendaPoint = app.get('models').AgendaPoint;
 const Penalty = app.get('models').Penalty;
+const PETiano = app.get('models').PETiano;
+const AbsentOrLate = app.get('models').AbsentOrLate;
 
-var locker = false;
-
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
 	var query = {
 		attributes: ['Id', 'Date', 'Status'],
 		order: [['Id', 'DESC']]
@@ -31,26 +31,22 @@ router.get('/', function(req, res) {
 	RecordOfMeeting
 		.findAll(query)
 		.then((result) => {
-			var ret = [];
-			for(var i = 0; i < result.length; ++i)
-				ret.push(result[i].toJSON());
-			ret.reverse();
-			res.status(200).json(ret);
+			res.status(200).json(result);
 		})
 		.catch((err) => {
 			res.status(500).json({message: err.message});
 		});
 });
 
-router.get('/:recordOfMeetingId', function(req, res) {
+router.get('/:recordOfMeetingId', (req, res) => {
 	RecordOfMeeting
 		.findById(req.params.recordOfMeetingId, {
 			include: [
-				{model: app.get('models').PETiano, as: 'Ateiro'},
-				{model: app.get('models').PETiano, as: 'President'},
-				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-				{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-					{model: app.get('models').PETiano, as: 'PETiano'}
+				{model: PETiano, as: 'Ateiro'},
+				{model: PETiano, as: 'President'},
+				{model: AgendaPoint, as: 'AgendaPoints'},
+				{model: AbsentOrLate, as: 'AbsentsOrLates', include: [
+					{model: PETiano, as: 'PETiano'}
 				]}
 			]
 		})
@@ -66,11 +62,11 @@ router.get('/:recordOfMeetingId/download', (req, res) => {
 	RecordOfMeeting
 		.findOne({
 			include: [
-				{model: app.get('models').PETiano, as: 'Ateiro'},
-				{model: app.get('models').PETiano, as: 'President'},
-				{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-				{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-					{model: app.get('models').PETiano, as: 'PETiano'}
+				{model: PETiano, as: 'Ateiro'},
+				{model: PETiano, as: 'President'},
+				{model: AgendaPoint, as: 'AgendaPoints'},
+				{model: AbsentOrLate, as: 'AbsentsOrLates', include: [
+					{model: PETiano, as: 'PETiano'}
 				]}
 			],
 			where: {
@@ -86,7 +82,6 @@ router.get('/:recordOfMeetingId/download', (req, res) => {
 			var html = app.get('recordOfMeetingRender')(result.toJSON());
 			htmlPdf.create(html, {format: 'Letter', timeout: 60000}).toStream((err, result) => {
 				if(err) {
-					console.log(err);
 					res.status(500).json({message: 'Erro interno'});
 				} else {
 					res.contentType('application/pdf');
@@ -95,56 +90,60 @@ router.get('/:recordOfMeetingId/download', (req, res) => {
 			});
 		})
 		.catch((err) => {
-			console.log(err);
 			res.status(500).json({message: 'Erro interno'});
 		});
 });
 
-var lockefFunction = function(req, res, next) {
+var locker = false;
+
+var lockerFunction = function(req, res, next) {
 	if (locker)
 		res.status(400).json({message: 'Ata bloqueada no momento'});
 	else
 		next();
 };
 
-router.put('/:recordOfMeetingId', function(req, res) {
-	var data = {
-		AteiroId: req.body.AteiroId,
-		PresidentId: req.body.PresidentId
-	};
+router.put('/:recordOfMeetingId', lockerFunction, function(req, res) {
+	var data = {};
+	if (req.body.AteiroId)
+		data.AteiroId = req.body.AteiroId;
+	if (req.body.PresidentId)
+		data.PresidentId = req.body.PresidentId;
 	RecordOfMeeting
 		.update(data, {where: {Id: req.params.recordOfMeetingId, Status: 1}})
 		.then((result) => {
-			if(!result[0])
-				res.status(404).json({message: 'Ata não encontrada'});
-			else
+			if(result[0] === 1)
 				res.end();
+			else
+				res.status(404).json({message: 'Ata nao encontrada'});
 		})
 		.catch((err) => {
 			res.status(500).json({message: 'Erro interno'});
 		});
 });
 
-router.post('/:recordOfMeetingId', function(req, res) {
+router.post('/:recordOfMeetingId', lockerFunction, function(req, res) {
+	locker = true;
 	RecordOfMeeting
 		.update({Status: 2}, {where: {Id: req.params.recordOfMeetingId, Status: 1}})
 		.then((result) => {
-			if(result[0]) {
+			locker = false;
+			if (result[0] === 1) {
 				res.end();
 				RecordOfMeeting
 					.findById(req.params.recordOfMeetingId, {
 						include: [
-							{model: app.get('models').PETiano, as: 'Ateiro'},
-							{model: app.get('models').PETiano, as: 'President'},
-							{model: app.get('models').AgendaPoint, as: 'AgendaPoints'},
-							{model: app.get('models').AbsentOrLate, as: 'AbsentsOrLates', include: [
-								{model: app.get('models').PETiano, as: 'PETiano'}
+							{model: PETiano, as: 'Ateiro'},
+							{model: PETiano, as: 'President'},
+							{model: AgendaPoint, as: 'AgendaPoints'},
+							{model: AbsentOrLate, as: 'AbsentsOrLates', include: [
+								{model: PETiano, as: 'PETiano'}
 							]}
 						]
 					})
 					.then((result) => {
 						var transp = app.get('mailTransporter');
-						if(transp && process.env.EMAIL_DESTINY && process.env.EMAIL) {
+						if (transp && process.env.EMAIL_DESTINY && process.env.EMAIL) {
 							var html = app.get('recordOfMeetingRender')(result.toJSON());
 							htmlPdf.create(html, {format: 'Letter'}).toBuffer((err, pdfStream) => {
 									transp
@@ -161,7 +160,7 @@ router.post('/:recordOfMeetingId', function(req, res) {
 												}
 											]
 										}, function(err, info) {
-											if(err)
+											if (err)
 												console.log(err);
 										});
 								});
@@ -181,100 +180,106 @@ router.post('/:recordOfMeetingId', function(req, res) {
 						})
 					});
 			} else {
-				res.status(403).json({message: 'Nada a alterar'});
+				res.status(400).json({message: 'Nao ha nenhuma ata aberta com esse id'});
 			}
 		})
 		.catch((err) => {
+			locker = false;
 			res.status(500).json({message: err.message});
 		});
 });
 
-router.post('/', function(req, res) {
+router.post('/', lockerFunction, function(req, res) {
+	locker = true;
 	RecordOfMeeting
 		.findOne({
 			include: [
-				{model: app.get('models').PETiano, as: 'Ateiro'},
-				{model: app.get('models').PETiano, as: 'President'},
+				{model: PETiano, as: 'Ateiro'},
+				{model: PETiano, as: 'President'},
 				{model: AgendaPoint, as: 'AgendaPoints'}
 			],
 			order: [['Id', 'DESC']]
 		})
-		.then(function(result) {
-			if(result.Status != 2)
-				 return res.status(403).json({message: 'Ata ainda aberta.'});
+		.then((lastRecord) => {
+			if(lastRecord.Status !== 2) {
+				locker = false;
+				return res.status(403).json({message: 'Ata ainda aberta.'});
+			}
 			RecordOfMeeting
-				.create({
-					Status: 1,
-					AteiroId: result.AteiroId,
-					PresidentId: result.PresidentId
-				}, {
-					include: [
-						{model: app.get('models').PETiano, as: 'Ateiro'},
-						{model: app.get('models').PETiano, as: 'President'},
-						{model: AgendaPoint, as: 'AgendaPoints'}
-					]
-				})
-				.then((result1) => {
+			  .create({
+			    Status: 1,
+			    AteiroId: lastRecord.AteiroId,
+			    PresidentId: lastRecord.PresidentId
+			  }, {
+			    include: [
+			      {model: AgendaPoint, as: 'AgendaPoints'}
+			    ]
+			  })
+				.then((newRecord) => {
 					parallel([
 						(cb) => {
 							var toDos = [];
-							for(var i = 0; i < result.AgendaPoints.length; ++i)
-							{
-								var agendaPoint = result.AgendaPoints[i];
+							each(lastRecord.AgendaPoints, (a, done) => {
 								toDos.push({
-									RecordOfMeetingId: result1.Id,
-									PETianoId: agendaPoint.PETianoId,
-									Title: agendaPoint.Title,
-									Description: agendaPoint.Description,
-									Status: (agendaPoint.Status == 2) ? 2 : 3
+									RecordOfMeetingId: newRecord.Id,
+									PETianoId: a.PETianoId,
+									Title: a.Title,
+									Description: a.Description,
+									Status: (a.Status == 2) ? 2 : 3
 								});
-							}
-							AgendaPoint
-								.bulkCreate(toDos, {returning: true})
-								.then((results) => {
-									for(var i = 0; i < results.length; ++i)
-										results[i] = results[i].toJSON();
-									cb(null, results);
-								})
-								.catch(cb);
+								done();
+							}, () => {
+								AgendaPoint
+									.bulkCreate(toDos, {returning: true})
+									.then((agendaPoints) => {
+										for(var i = 0; i < agendaPoints.length; ++i)
+											agendaPoints[i] = agendaPoints[i].toJSON();
+										cb(null, agendaPoints);
+									})
+									.catch(cb);
+							});
 						},
 						(cb) => {
 							AgendaPoint
-								.update({
-									RecordOfMeetingId: result1.Id,
-									Status: 4,
-								}, {
-									where: {
-										Status: 1
-									},
-									returning: true
-								})
-								.then((result) => {
-									var results = result[1];
-									for(var i = 0; i < result[0]; ++i)
-										results[i] = result[1][i].toJSON();
-									cb(null, results);
-								})
-								.catch(cb);
+					      .update({
+					        RecordOfMeetingId: newRecord.Id,
+					        Status: 4,
+					      }, {
+					        where: {
+					          Status: 1
+					        },
+					        returning: true
+					      })
+					      .then((result) => {
+					        var agendaPoints = result[1];
+					        for(var i = 0; i < agendaPoints.length; ++i)
+					          agendaPoints[i] = agendaPoints[i].toJSON();
+					        cb(null, agendaPoints);
+					      })
+					      .catch(cb);
 						}
 					], (err, results) => {
-						if(err)
-							return res.status(500).send({message: 'Erro interno'});
-						var ret = result1.toJSON();
-						ret.AgendaPoints = results[0].concat(results[1]);
+						locker = false;
+						if (err)
+							return res.status(500).json({message: 'Erro interno'});
+						var ret = newRecord.toJSON();
+						ret.Ateiro = lastRecord.Ateiro.toJSON();
+						ret.President = lastRecord.President.toJSON();
+						ret.AgendaPoints = [];
+					  ret.AgendaPoints = results[0].concat(results[1]);
 						ret.AbsentsOrLates = [];
-						ret.Ateiro = result.Ateiro.toJSON();
-						ret.President = result.President.toJSON();
 						res.status(201).json(ret);
 					});
 				})
 				.catch((err) => {
+					locker = false;
 					res.status(500).send({message: 'Erro interno'});
 				});
 		})
-		.catch(function(err) {
+		.catch((err) => {
+			locker = false;
 			res.status(500).send({message: 'Erro interno'});
 		});
-})
+});
 
 module.exports = router;
