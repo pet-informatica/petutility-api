@@ -1,7 +1,7 @@
-var path = require('path');
-var app = require(path.join(__dirname, '../../index')).app;
-var router = require('express').Router();
-var parallel = require('async/parallel');
+const path = require('path');
+const app = require(path.join(__dirname, '../../index')).app;
+const router = require('express').Router();
+const parallel = require('async/parallel');
 
 router.post('/', function(req, res) {
 	parallel([
@@ -39,12 +39,12 @@ router.post('/', function(req, res) {
 		{
 			res.status(500);
 			res.send({message: 'Erro interno'});
-			return;	
+			return;
 		}
 		res.json(results[1].toJSON());
 		res.end();
 	});
-	
+
 });
 
 router.put('/:id', function(req, res) {

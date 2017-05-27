@@ -1,28 +1,23 @@
 angular
 	.module('Finance')
-	.factory('PigpetAPI', ['Request', 'UserService', '$resource', '$cookies',
-			function(Request, UserService, $resource, $cookies) {
-		var API = {
-			getPigPetBalance: Request.send('get', $resource('/api/pigpet/getPigPetBalance')),
-			updatePigPetBalance: Request.send('save', $resource('/api/pigpet/updatePigPetBalance'))
-		};
+	.factory('PigpetAPI', function(Request, UserService, $resource, $cookies) {
+		var API = $resource('/api/pigpet/:pigPetId');
 
 		return {
       getPigPetBalance: (done) => {
-				API.getPigPetBalance()
-				.then(function(data) {
+				API.get({}, function(data) {
 					return done && done(null, data);
 				}, function(err) {
 					return done && done(err);
-				})
+				});
 			},
-			updatePigPetBalance: (pigpet, done) => {
-				API.updatePigPetBalance(pigpet)
-				.then(function(data) {
+			updatePigPetBalance: (parameters, done) => {
+				API.update({}, parameters, function(data) {
 					return done && done(null, data);
 				}, function(err) {
 					return done && done(err);
-				})
+				});
 			}
 		}
-	}]);
+	}
+);

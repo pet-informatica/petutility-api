@@ -50,7 +50,7 @@
 </div>
 <div class="modal" id="closeSelecaoModal">
   <div class="modal-content">
-    <h1>Fechar Selecao</h1>
+    <h1><span ng-if="!selecao.IsOpen">Abrir</span><span ng-if="selecao.IsOpen">Fechar</span> Selecao</h1>
     <p class="flow-text" ng-if="selecao.IsOpen">Deseja realmente fechar essa seleção?</p>
     <p class="flow-text" ng-if="!selecao.IsOpen">Deseja realmente abrir essa seleção?</p>
   </div>

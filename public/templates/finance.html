@@ -108,7 +108,7 @@
 						<p><strong>Mês: </strong>{{pocket.MonthName}}</p>
 						<p>Data: {{pocket.Date | date: 'dd/M/yy' }}</p>
 					<div class="secondary-content">
-						<a><i class="material-icons modal-trigger" style="cursor:pointer;" ng-click="editPocketOpenModal(pocket.Id)">edit</i></a>
+						<a><i class="material-icons modal-trigger" style="cursor:pointer;" ng-click="editPocketOpenModal(pocket)">edit</i></a>
 						<a ng-click="deletePocket(pocket.Id)"><i class="material-icons" style="cursor:pointer;">delete</i></a>
 					</div>
 		    </li>
@@ -160,7 +160,7 @@
 					<input type="number" placeholder="Valor" class="validate" ng-model="payment.value">
 				</div>
 				<div class="col s6">
-					<select id="paymenttype">
+					<select ng-model="payment.type">
 						<option value="" disabled selected>Selecione o tipo de pagamento</option>
 			      <option value="1">Multa</option>
 			      <option value="2">PigPET</option>
@@ -183,7 +183,7 @@
 				    <input
 				    	type="file"
 				    	ngf-select
-				    	ng-model="payment.Photo"
+				    	ng-model="payment.photo"
 				    	name="Photo"
 				    	ngf-pattern="image/*"
 				    	accept="image/*"
@@ -196,13 +196,13 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="payment.date">
+					<input id="paymentdate" type="date" class="datepicker" placeholder="Data" ng-model="payment.date">
 				</div>
 			</div>
 			<input type="text" placeholder="Observações" class="validate" ng-model="payment.notes">
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPayment(payment.value, payment.date, payment.notes, payment.instrument, payment.Photo)">Adicionar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="createPayment(payment)">Adicionar</a>
     </div>
   </div>
 
@@ -215,7 +215,7 @@
 					<input type="number" class="validate" placeholder="Valor" ng-model="penalty.value">
 				</div>
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="penalty.date">
+					<input type="date" id="penaltyDate" class="datepicker" placeholder="Data" ng-model="penalty.date">
 				</div>
 			</div>
 			<div class="row">
@@ -260,7 +260,7 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="pocket.date">
+					<input type="date" class="datepicker" id="pocketDate" placeholder="Data" ng-model="pocket.date">
 				</div>
 			</div>
     </div>
@@ -278,7 +278,7 @@
 					<input type="number" class="validate" placeholder="Valor" ng-model="spending.value">
 				</div>
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="spending.date">
+					<input id="spendingDate" placeholder="Data" type="date" class="datepicker" ng-model="spending.date">
 				</div>
 			</div>
 			<input type="text" placeholder="Descrição" class="validate" ng-model="spending.description">
@@ -307,13 +307,13 @@
 			<div class="divider"></div>
 			<div class="row">
 				<div class="col s6">
-					<input type="number" placeholder="Valor" class="validate" ng-model="pigpet.value">
+					<input type="number" placeholder="Valor" class="validate" ng-model="pigpet.Balance">
 				</div>
 			</div>
 			<input type="text" placeholder="Motivo da alteração manual" class="validate" ng-model="pigpet.justification">
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePigPetBalance(pigpet.value, pigpet.justification)">Confirmar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePigPetBalance(pigpet.Balance, pigpet.justification)">Confirmar</a>
     </div>
   </div>
 
@@ -323,7 +323,7 @@
 			<div class="divider"></div>
 			<div class="row">
 				<div class="col s6">
-					<select id="pocketMonth" ng-model="pocket.month">
+					<select id="pocketMonth" ng-model="pocket.Month">
 			      <option value="" disabled selected>Selecione o mês</option>
 			      <option value="1">Janeiro</option>
 			      <option value="2">Fevereiro</option>
@@ -340,17 +340,17 @@
 			    </select>
 				</div>
 				<div class="col s6">
-					<input placeholder="Ano" id="pocketYear" type="number" class="validate" ng-model="pocket.year">
+					<input placeholder="Ano" id="pocketYear" type="number" class="validate" ng-model="pocket.Year">
 				</div>
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="pocket.date">
+					<input type="text" class="datepicker" id="updatePocketDate" placeholder="Data" ng-model="pocket.Date">
 				</div>
 			</div>
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePocket(pocket.month, pocket.year, pocket.date)">Confirmar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePocket(pocket.Month, pocket.Year, pocket.Date)">Confirmar</a>
     </div>
   </div>
 
@@ -363,7 +363,7 @@
 					<input type="number" placeholder="Valor" class="validate" ng-model="paymentToUpdate.Value">
 				</div>
 				<div class="col s6">
-					<select id="updatepaymenttype">
+					<select ng-model="paymentToUpdate.Type">
 						<option value="" disabled>Selecione o tipo de pagamento</option>
 			      <option value="1">Multa</option>
 			      <option value="2">PigPET</option>
@@ -373,7 +373,7 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<select id="paymentinstrument" ng-model="paymentToUpdate.Instrument">
+					<select ng-model="paymentToUpdate.Instrument">
 						<option value="" disabled>Selecione o tipo de pagamento</option>
 			      <option value="1">Transferência</option>
 			      <option value="2">Dinheiro</option>
@@ -399,13 +399,13 @@
 			</div>
 			<div class="row">
 				<div class="col s6">
-					<input class="datepicker" placeholder="Data" type="date" ng-model="paymentToUpdate.Date">
+					<input id="updatepaymentdate" class="datepicker" placeholder="Data" type="date" ng-model="paymentToUpdate.Date">
 				</div>
 			</div>
 			<input type="text" placeholder="Observações" class="validate" ng-model="paymentToUpdate.Notes">
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePayment()">Confirmar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updatePayment(paymentToUpdate)">Confirmar</a>
     </div>
   </div>
 
@@ -418,7 +418,7 @@
 					<input type="number" class="validate" placeholder="Valor" ng-model="penaltyToUpdate.Value">
 				</div>
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="penaltyToUpdate.Date">
+					<input type="date" id="updatePenaltyDate" class="datepicker" placeholder="Data" ng-model="penaltyToUpdate.Date">
 				</div>
 			</div>
 			<div class="row">
@@ -441,16 +441,16 @@
 			<div class="divider"></div>
 			<div class="row">
 				<div class="col s6">
-					<input type="number" class="validate" placeholder="Valor" ng-model="spending.value">
+					<input type="number" class="validate" placeholder="Valor" ng-model="spending.Value">
 				</div>
 				<div class="col s6">
-					<input type="date" class="datepicker" placeholder="Data" ng-model="spending.date">
+					<input type="date" class="datepicker" id="updateSpendingDate" placeholder="Data" ng-model="spending.Date">
 				</div>
 			</div>
-			<input type="text" placeholder="Descrição" class="validate" ng-model="spending.description">
+			<input type="text" placeholder="Descrição" class="validate" ng-model="spending.Description">
     </div>
     <div class="modal-footer">
-      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updateSpending(spending.value, spending.date, spending.description)">Adicionar</a>
+      <a class="modal-action modal-close waves-effect waves-green btn-flat" style="color: #e65100;" ng-click="updateSpending(spending.Value, spending.Date, spending.Description)">Adicionar</a>
     </div>
   </div>
 

@@ -1,103 +1,75 @@
-var path = require('path');
-var app = require(path.join(__dirname, '../../index')).app;
-var router = require('express').Router();
-var Sequelize = require('sequelize');
+const path = require('path');
+const app = require(path.join(__dirname, '../../index')).app;
+const router = require('express').Router();
+const Sequelize = require('sequelize');
+const Event = app.get('models').Event;
 
-
-router.get('/', function(req, res)
-{
-	app
-		.get('models')
-		.Event
+router.get('/', function(req, res) {
+	Event
 		.findAll({
 			where:{
 				start:{
-					$between: [req.query.s, req.query.e]
+					$between: [req.query.s||Date.now, req.query.e||Date.now]
 				}
 			}
 		})
-		.then(function(result)
-			{
-				res.send(result);
-			}
-		)
-		.catch(function(result)
-			{
-				res.status(500);
-				res.send('Internal server error');
-			}
-		);
+		.then(function(result) {
+			res.send(result);
+		})
+		.catch(function(result) {
+			res.status(500);
+			res.send('Internal server error');
+		});
 });
 
-router.post('/save', function(req, res)
-{
-	app
-		.get('models')
-		.Event
-		.create(
-			{
-				title: req.body.title,
-				start: req.body.start,
-				time: req.body.time,
-				PETianoId: req.user.Id
-			}
-			)
-		.then((result) => {
+router.post('/', function(req, res) {
+	Event
+		.create({
+			title: req.body.title,
+			start: req.body.start,
+			time: req.body.time,
+			PETianoId: req.user.Id
+		})
+		.then(function(result) {
 			res.send(result.toJSON());
 		})
-		.catch(function(result)
-			{
-				res.status(500);
-				res.send('Internal server error');
-			}
-		);
+		.catch(function(result) {
+			res.status(500);
+			res.send('Internal server error');
+		});
 });
 
-router.put('/update/:eventId', function(req, res)
-{
-	app
-		.get('models')
-		.Event
-		.update(
-			{
-				title: req.body.eventTitle,
-				start: req.body.start,
-				time: req.body.time
-			},
-			{
-				where: {Id: req.params.eventId}, returning: true
-			}
-			)
-		.then((result) => {
+router.put('/:eventId', function(req, res) {
+	Event
+		.update({
+			title: req.body.eventTitle,
+			start: req.body.start,
+			time: req.body.time
+		},
+		{
+			where: {Id: req.params.eventId}, returning: true
+		})
+		.then(function(result) {
 			res.status(200).end();
 		})
-		.catch(function(result)
-			{
-				res.status(500);
-				res.send('Internal server error');
-			}
-		);
+		.catch(function(result) {
+			res.status(500);
+			res.send('Internal server error');
+		});
 });
 
-router.delete('/delete/:eventId', function(req, res)
-{
-	app
-		.get('models')
-		.Event
-		.destroy(
-			{
-				where: {Id: req.query.Id}
-			}
-			)
-		.then((result) => {
+router.delete('/:eventId', function(req, res) {
+	Event
+		.destroy({
+			where: {Id: req.params.eventId}
+		})
+		.then(function(result) {
 			res.status(200).end();
 		})
-		.catch(function(result)
-			{
-				res.status(500);
-				res.send('Internal server error');
-			}
-		);
+		.catch(function(result) {
+			res.status(500);
+			res.send('Internal server error');
+		});
 });
 
 module.exports = router;

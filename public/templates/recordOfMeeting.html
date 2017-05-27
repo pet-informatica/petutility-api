@@ -21,8 +21,8 @@
 				</li>
 			</ul>
 		</div>
-		<button ng-if="recordOfMeeting.Status === 1" class="btn-floating btn-large orange darken-4" style="position: absolute; top: 50%; margin-top: -33px; right: 20px;">
-			<i class="material-icons" ng-click="editAteiroAndPresident()">
+		<button ng-if="recordOfMeeting.Status === 1" class="btn-floating btn-large orange darken-4" style="position: absolute; top: 50%; margin-top: -33px; right: 20px;" ng-click="editAteiroAndPresident()">
+			<i class="material-icons">
 				edit
 			</i>
 		</button>
@@ -33,7 +33,7 @@
 				<div class="row">
 					<p class="white-text">Ausentes ({{(recordOfMeeting.AbsentsOrLates | filter: {'Type': 1} : true).length}})</p>
 					<section>
-						<div ng-repeat="absent in recordOfMeeting.AbsentsOrLates | filter: {'Type': 1} : true | orderBy: 'Id'" class="chip tooltipped" data-position="top" data-delay="50" data-tooltip="{{'Razão: ' + (absent.Reason ? absent.Reason : '-')}}" ng-style="{'background-color': (absent.IsJustified ? '#AED581' : '#E57373')}">
+						<div ng-repeat="absent in recordOfMeeting.AbsentsOrLates | filter: {'Type': 1} : true | orderBy: 'Name'" class="chip tooltipped" data-position="top" data-delay="50" data-tooltip="{{'Razão: ' + (absent.Reason ? absent.Reason : '-')}}" ng-style="{'background-color': (absent.IsJustified ? '#AED581' : '#E57373')}">
 							<span ng-if="absent.PETiano">
 								<img ng-src="{{absent.PETiano.Photo}}">
 								<i class="material-icons" style="cursor:pointer;float:right;font-size:16px;line-height:32px;padding-left:8px;" ng-click="deleteAbsentOrLate(absent)" ng-if="recordOfMeeting.Status === 1">close</i>

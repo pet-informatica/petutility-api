@@ -1,19 +1,19 @@
 // /api/candidato
-var path = require('path');
-var router = require('express').Router();
-var Sequelize = require('sequelize');
-var cloudinary = require('cloudinary');
-var cloudinaryStorage = require('multer-storage-cloudinary');
-var multer = require('multer');
+const path = require('path');
+const router = require('express').Router();
+const Sequelize = require('sequelize');
+const cloudinary = require('cloudinary');
+const cloudinaryStorage = require('multer-storage-cloudinary');
+const multer = require('multer');
 
-var app = require(path.join(__dirname, '../../index')).app;
-var candidatoAuthentication = require(path.join(__dirname, '../../services/candidatoAuthentication.js'));
+const app = require(path.join(__dirname, '../../index')).app;
+const candidatoAuthentication = require(path.join(__dirname, '../../services/candidatoAuthentication.js'));
 
-var Candidato = app.get('models').Candidato;
-var Etapa = app.get('models').Etapa;
-var PETiano = app.get('models').PETiano;
+const Candidato = app.get('models').Candidato;
+const Etapa = app.get('models').Etapa;
+const PETiano = app.get('models').PETiano;
 
-var parser = multer({
+const parser = multer({
 	storage: cloudinaryStorage({
 		cloudinary: cloudinary,
 		folder: function(req, file, cb) {
