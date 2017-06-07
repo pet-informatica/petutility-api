@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "devStart": "npm install && bower install --allow-root && ./node_modules/sequelize-cli/bin/sequelize db:migrate && (gulp &) && nodemon --ignore public/ --ignore gulpfile.js index.js",
+    "devStart": "npm install && bower install --allow-root && sequelize db:migrate && (gulp &) && nodemon --ignore public/ --ignore gulpfile.js index.js",
     "heroku-postbuild": "./node_modules/bower/bin/bower install; ./node_modules/sequelize-cli/bin/sequelize db:migrate; ./node_modules/gulp/bin/gulp.js production",
     "clear": "rm -r node_modules & rm -r bower_components & rm .bower.json.md5 & rm .package.json.md5 & rm -r public/bin"
   },
