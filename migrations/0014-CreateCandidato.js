@@ -69,7 +69,7 @@ module.exports = {
       EtapaId: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'PETiano',
+          model: 'Etapa',
           key: 'Id'
         },
         onUpdate: 'cascade',
