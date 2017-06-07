@@ -25,8 +25,8 @@
     "jt.timepicker": "jquery-timepicker-jt#^1.11.11"
   },
   "resolutions": {
-    "angular": "1.6.4",
-    "jquery": "3.1.0",
+    "angular": "^1.6.3",
+    "jquery": "^3.1.0",
     "fullcalendar": "^3.3.0"
   }
 }
