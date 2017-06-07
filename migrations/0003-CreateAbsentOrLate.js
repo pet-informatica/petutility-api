@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface.createTable('AbsentOrLate', {
+    return queryInterface.createTable('AbsentOrLate', {
   		Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
@@ -45,6 +45,6 @@ module.exports = {
   	});
   },
   down: function(queryInterface, DataTypes) {
-    queryInterface.dropTable('AbsentOrLate');
+    return queryInterface.dropTable('AbsentOrLate');
   }
 }

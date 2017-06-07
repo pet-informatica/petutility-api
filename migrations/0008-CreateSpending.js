@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface.createTable('Spending', {
+    return queryInterface.createTable('Spending', {
       Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
@@ -37,6 +37,6 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes) {
-    queryInterface.dropTable('Spending');
+    return queryInterface.dropTable('Spending');
   }
 }
