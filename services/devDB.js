@@ -9,6 +9,13 @@ module.exports = (done) => {
 		.truncate({cascade: true})
 		.then(() => {
 			models
+				.PigPET
+				.create({
+					Id: 1,
+					Balance: 1000.00
+				})
+				.then();
+			models
 				.Selecao
 				.create({
 					Year: 2014,

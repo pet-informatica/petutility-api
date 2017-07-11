@@ -4,7 +4,7 @@ var cloudinary = require('cloudinary');
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface.createTable('Candidato', {
+    return queryInterface.createTable('Candidato', {
       Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
@@ -69,7 +69,7 @@ module.exports = {
       EtapaId: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'PETiano',
+          model: 'Etapa',
           key: 'Id'
         },
         onUpdate: 'cascade',
@@ -78,6 +78,6 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes) {
-    queryInterface.dropTable('Candidato');
+    return queryInterface.dropTable('Candidato');
   }
 }

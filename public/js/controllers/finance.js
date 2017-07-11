@@ -5,6 +5,7 @@ angular
 		$scope.payments = [];
 		$scope.PETianosList = [];
 		$scope.penalties = [];
+		$scope.spending = {};
 
 		var monthNames = {'1': 'Janeiro', '2': 'Fevereiro', '3': 'Março', '4': 'Abril', '5': 'Maio',
 							'6': 'Junho', '7': 'Julho', '8': 'Agosto', '9': 'Setembro', '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'};
@@ -48,8 +49,8 @@ angular
 
 		$scope.filterPayments = function() {
 			$scope.payments = [];
-			for(var index = 0; index < $scope.dataset.length; index+=1) {
-				var p = $scope.dataset[index];
+			for(var i = 0; i < $scope.dataset.length; ++i) {
+				var p = $scope.dataset[i];
 				if(status[p.Status]) {
 					p = filterSolePayment(p);
 					$scope.payments.push(p);
@@ -149,11 +150,7 @@ angular
 		//on load functions
 
 		var loadPayments = function(isPigPet) {
-			if(isPigPet) {
-				$scope.getPendingPaymentsPigPet();
-			} else {
-				$scope.getPayments();
-			}
+			$scope.getPayments();
 		}
 
 		var loadPenalties = function(isPigPet) {
@@ -229,86 +226,97 @@ angular
 				Status: 2
 			}
 			Upload.upload({
-				url: '/api/payment/updatePayment',
+				url: '/api/payment/'+pay.Id,
 				data: pay
 			})
 			.then(function(data) {
 				var p = filterSolePayment(data.data);
 				updatePaymentScope(p);
 			}, function(err) {
-				console.log("error in update payment");
+				// console.log("error in update payment");
 			}, function(evt) {
-				console.log("fazendo upload");
+				// console.log("fazendo upload");
 			});
 		}
 
 		$scope.getPayments = function() {
 			PaymentAPI.getPayments((err, data) => {
-				if(err)
+				if(err){
 					$scope.errMsg = err.status + ' - ' + err.data.message;
-				else {
+				} else {
 					$scope.errMsg = null;
 					$scope.dataset = data;
 					$scope.filterPayments();
 				}
 			});
-		}
+		};
 
-		$scope.createPayment = function(value, date, notes, instrument, photo) {
-			var type = $("#paymenttype").val();
+		$scope.createPayment = function(payment) {
+			var date = $('#paymentdate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var pay = {
-				Type: type,
-				Value: value,
+				Type: payment.type,
+				Value: payment.value,
 				Date: date,
 				Status: 3,
-				Notes: notes,
-				Instrument: instrument,
+				Notes: payment.notes,
+				Instrument: payment.instrument,
 				PETianoId: UserService.user.Id,
-				Photo: photo
+				Photo: payment.photo
 			};
 			Upload.upload({
-				url: '/api/payment/createPayment',
+				url: '/api/payment/',
+				method: 'POST',
 				data: pay
 			})
 			.then(function(data) {
 				var p = filterSolePayment(data.data);
 				$scope.payments.push(p);
 			}, function(err) {
-				console.log("error in create payment");
-				console.log(err);
+				// console.log(err);
 			}, function(evt) {
-				console.log("fazendo upload");
+				// // console.log("fazendo upload");
 			});
 		};
 
 		$scope.acceptPayment = function(id) {
-			var pay = {
-				Id: id
-			}
+			var pay = {Id: id};
 			PaymentAPI.acceptPayment(pay, function(done, data) {
 				var p = filterSolePayment(data.payment);
 				updatePaymentScope(data.payment);
 				$scope.pigPetBalance = data.pigpet.Balance;
 			}, function(err) {
-				console.log("error in acceptPayment");
+				// console.log("error in acceptPayment");
 			})
 		}
 
-		$scope.updatePayment = function() {
-			var type = $("#updatepaymenttype").val();
-			var pay = $scope.paymentToUpdate;
-			if(type != "")
-				pay.Type = type;
+		$scope.updatePayment = function(payment) {
+			var date = $('#updatepaymentdate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
+			payment.Date = date;
 			Upload.upload({
-				url: '/api/payment/updatePayment',
-				data: pay
+				url: '/api/payment/'+payment.Id,
+				method: 'PUT',
+				data: payment
 			})
 			.then(function(data) {
-				updatePaymentScope(pay);
+				updatePaymentScope(payment);
 			}, function(err) {
-				console.log("error in create payment");
+				// console.log("error in create payment");
 			}, function(evt) {
-				console.log("fazendo upload");
+				// // console.log("fazendo upload");
 			});
 		}
 
@@ -327,7 +335,7 @@ angular
 			PaymentAPI.deletePayment(pay, function(done) {
 				deletePaymentFromScope(pay.Id);
 			}, function(err) {
-				console.log("error in delete payment");
+				// console.log("error in delete payment");
 			});
 		}
 
@@ -335,11 +343,11 @@ angular
 
 		$scope.getPigPetBalance = function() {
 			PigpetAPI.getPigPetBalance((err, data) => {
-				if(err)
+				if(err) {
 					$scope.errMsg = err.status + ' - ' + err.data.message;
-				else {
+				} else {
 					$scope.errMsg = null;
-					$scope.pigPetBalance = data.Balance;
+					$scope.pigPetBalance = (data.Balance);
 				}
 			});
 		}
@@ -353,22 +361,9 @@ angular
 				reason: justification
 			}
 			PigpetAPI.updatePigPetBalance(parameters, function(err, data) {
-				$scope.pigPetBalance = data.Balance;
+				$scope.pigPetBalance = (data.Balance);
 			}, function(err) {
-				console.log("error in update pigpet balance");
-			});
-		}
-
-		$scope.getPendingPaymentsPigPet =	function() {
-			PaymentAPI.getPendingPaymentsPigPet((err, data) => {
-				if(err) {
-					$scope.errMsg = err.status + ' - ' + err.data;
-				}
-				else {
-					$scope.errMsg = null;
-					$scope.dataset = data;
-					$scope.filterPayments();
-				}
+				// console.log("error in update pigpet balance");
 			});
 		}
 
@@ -405,6 +400,14 @@ angular
 		}
 
 		$scope.createPenalty = function(value, date, justification, petianoid) {
+			date = $('#penaltyDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var email = getEmailOfPETiano(petianoid);
 			var parameters = {
 				penalty: {
@@ -420,7 +423,7 @@ angular
 				var p = $scope.organizeSolePenalty(data);
 				$scope.penalties.push(p);
 			}, function(err) {
-				console.log("error in createPenalty");
+				// console.log("error in createPenalty");
 			})
 		}
 
@@ -451,10 +454,19 @@ angular
 
 		$scope.updatePenalty = function() {
 			var penalty = $scope.penaltyToUpdate;
+			date = $('#updatePenaltyDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
+			penalty.Date = date;
 			PenaltyAPI.updatePenalty(penalty, function(err, data) {
 				updatePenaltyScope(data);
 			}, function(err) {
-				console.log("error in update penalty");
+				// // console.log("error in update penalty");
 			})
 		}
 
@@ -466,7 +478,7 @@ angular
 			PenaltyAPI.changePenaltyStatus(penalty, function(err, data) {
 				updatePenaltyIdScope(id);
 			}, function(err) {
-				console.log("error in change penalty status");
+				// // console.log("error in change penalty status");
 			})
 		}
 
@@ -485,13 +497,21 @@ angular
 			PenaltyAPI.deletePenalty(penalty, function() {
 				deletePenaltyFromScope(penalty);
 			}, function(err) {
-				console.log("error in delete penalty");
+				// // console.log("error in delete penalty");
 			})
 		}
 
 		//spending functions
 
 		$scope.createSpending = function(value, date, description) {
+			date = $('#spendingDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// // console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var status = ($scope.isPigpetAccount ? 1 : 2);
 			var spending = {
 				Description: description,
@@ -506,9 +526,9 @@ angular
 					$scope.pigPetBalance = parseFloat($scope.pigPetBalance) - parseFloat(value);;
 				}
 			}, function(err) {
-				console.log("error in create spending");
+				// console.log("error in create spending");
 			})
-		}
+		};
 
 		var deleteSpendingFromScope = function(spending) {
 			for(var index = 0; index < $scope.spendings.length; index+=1) {
@@ -530,7 +550,7 @@ angular
 					$scope.pigPetBalance = parseFloat($scope.pigPetBalance) + parseFloat(value);
 				}
 			}, function(err) {
-				 console.log("error in delete spending");
+				 // console.log("error in delete spending");
 			})
 		}
 
@@ -543,9 +563,9 @@ angular
 				acceptSpendingScope(id);
 				$scope.pigPetBalance = data.pigpet.Balance;
 			}, function(err) {
-				console.log("error in acceptSpending");
-			})
-		}
+				// console.log("error in accept spending");
+			});
+		};
 
 		var acceptSpendingScope = function(id) {
 			for(var index = 0; index < $scope.spendings.length; index+=1) {
@@ -573,6 +593,14 @@ angular
 		}
 
 		$scope.updateSpending = function(value, date, description) {
+			date = $('#updateSpendingDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var spending = {
 				Id: $scope.spendingToUpdate,
 				Description: description,
@@ -583,16 +611,18 @@ angular
 				data.Status = 2;
 				updateSpendingScope(data);
 			}, function(err) {
-				console.log("error in updateSpending");
+				// console.log("error in updateSpending");
 			})
 		}
 
 		//pocket functions
 
 		$scope.editPocketId = -1;
+		$scope.pocket = {};
 
-		$scope.editPocketOpenModal = function(id) {
-			$scope.editPocketId = id;
+		$scope.editPocketOpenModal = function(pocket) {
+			$scope.editPocketId = pocket.Id;
+			$scope.pocket = pocket;
 			$('#editPocketModal').openModal();
 		}
 
@@ -602,7 +632,14 @@ angular
 		}
 
 		$scope.createPocket = function(month, year, date) {
-			date = makeValidDate(date);
+			date = $('#pocketDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var pocket = {
 				Month: month,
 				Year: year,
@@ -612,7 +649,7 @@ angular
 				data.MonthName = monthNames[data.Month];
 				$scope.pockets.push(data);
 			}, function(err) {
-				console.log("error in create pocket");
+				// console.log("error in create pocket");
 			})
 		}
 
@@ -626,6 +663,14 @@ angular
 		}
 
 		$scope.updatePocket = function(month, year, date) {
+			date = $('#updatePocketDate').val();
+			date = date.split('/');
+			if(date.length!==3) {
+				// console.log("data invalida");
+				return;
+			}
+			date.reverse();
+			date = new Date(date);
 			var pocket = {
 				Id: $scope.editPocketId,
 				Month: month,
@@ -635,7 +680,7 @@ angular
 			PocketAPI.updatePocket(pocket, function(err, data) {
 				updatePocketScope(data);
 			}, function(err) {
-				console.log("error in update pocket");
+				// console.log("error in update pocket");
 			})
 		}
 
@@ -654,7 +699,7 @@ angular
 			PocketAPI.deletePocket(pocket, function() {
 				deletePocketFromScope(pocket);
 			}, function(err) {
-				console.log("error in delete pocket");
+				// console.log("error in delete pocket");
 			})
 		}
 
@@ -666,4 +711,5 @@ angular
 			loadPigPet();
 			$('select').material_select();
 		}, 1000);
-	});
+	}
+);

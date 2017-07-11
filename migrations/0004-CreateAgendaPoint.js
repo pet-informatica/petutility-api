@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface.createTable('AgendaPoint', {
+    return queryInterface.createTable('AgendaPoint', {
   		Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
@@ -45,6 +45,6 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes) {
-    queryInterface.dropTable('AgendaPoint');
+    return queryInterface.dropTable('AgendaPoint');
   }
 }

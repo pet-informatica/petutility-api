@@ -1,66 +1,49 @@
 angular
 	.module('Finance')
-	.factory('PaymentAPI', ['Request', 'UserService', '$resource', '$cookies',
-			function(Request, UserService, $resource, $cookies) {
-		var API = {
-			getPayments: Request.send('get', $resource('/api/payment/getPayments')),
-			createPayment: Request.send('save', $resource('/api/payment/createPayment')),
-			getPendingPaymentsPigPet: Request.send('query', $resource('/api/payment/getPendingPaymentsPigPet')),
-			deletePayment: Request.send('remove', $resource('/api/payment/deletePayment')),
-			updatePayment: Request.send('save', $resource('/api/payment/updatePayment')),
-			acceptPayment: Request.send('save', $resource('/api/payment/acceptPayment'))
-		};
+	.factory('PaymentAPI', function($resource) {
+		var API = $resource('/api/payment/:paymentId', {}, {
+			'accept': {
+				method: 'POST',
+				url: '/api/payment/:paymentId/accept'
+			}
+		});
 
 		return {
 			getPayments: (done) => {
-				API
-					.getPayments()
-					.then(function(data) {
-						return done && done(null, data.arr);
-					}, function(err) {
-						return done && done(err);
-					})
-			},
-			createPayment: (payment, done) => {
-				API.createPayment(payment)
-				.then(function(data) {
-					return done && done(null, data);
-				}, function(err) {
-					return err;
-				})
-			},
-			getPendingPaymentsPigPet: (done) => {
-				API.getPendingPaymentsPigPet()
-					.then(function(data) {
+				API.query(function(data) {
 						return done && done(null, data);
 					}, function(err) {
 						return done && done(err);
 					})
 			},
+			createPayment: (payment, done) => {
+				API.save(payment, function(data) {
+					return done && done(null, data);
+				}, function(err) {
+					return err;
+				})
+			},
 			deletePayment: (payment, done) => {
-				API.deletePayment(payment)
-				.then(function() {
+				API.delete({paymentId: payment.Id}, function() {
 					return done && done();
 				}, function(err) {
 					return done && done(err);
 				})
 			},
 			updatePayment: (payment, done) => {
-				API.updatePayment(payment)
-				.then(function(data) {
+				API.update({paymentId: payment.Id}, payment, function(data) {
 					return done && done(null, data);
 				}, function(err) {
 					return done && done(err);
 				})
 			},
 			acceptPayment: (payment, done) => {
-				API.acceptPayment(payment)
-				.then(function(data) {
+				API.accept({paymentId: payment.Id}, {}, function(data) {
 					return done && done(null, data);
 				}, function(err){
-					console.log("erro fac");
 					return done && done(err);
 				})
 			}
 		}
-	}]);
+	}
+);

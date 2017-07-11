@@ -1,7 +1,11 @@
 var app = angular.module('appRoutes');
 
 app
-	.config(function($stateProvider, $urlRouterProvider) {
+	.config(function($stateProvider, $urlRouterProvider, $resourceProvider) {
+		$resourceProvider.defaults.actions.update = {
+      method: 'PUT'
+    };
+		
 		$urlRouterProvider.otherwise('/calendar');
 
 		$stateProvider

@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface.createTable('PigPET', {
+    return queryInterface.createTable('PigPET', {
       Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
@@ -16,6 +16,6 @@ module.exports = {
     })
   },
   down: function(queryInterface, DataTypes) {
-    queryInterface.dropTable('PigPET');
+    return queryInterface.dropTable('PigPET');
   }
 }

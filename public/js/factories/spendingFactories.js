@@ -1,55 +1,50 @@
 angular
 	.module('Finance')
-	.factory('SpendingAPI', ['Request', 'UserService', '$resource', '$cookies',
-			function(Request, UserService, $resource, $cookies) {
-		var API = {
-			getSpendings: Request.send('query', $resource('/api/spending/getSpendings')),
-			createSpending: Request.send('save', $resource('/api/spending/createSpending')),
-			deleteSpending: Request.send('delete', $resource('/api/spending/deleteSpending')),
-			updateSpending: Request.send('save', $resource('/api/spending/updateSpending')),
-			acceptSpending: Request.send('save', $resource('/api/spending/acceptSpending'))
-		};
+	.factory('SpendingAPI',
+		function(Request, UserService, $resource, $cookies) {
+			var API = $resource('/api/spending/:spendingId', {}, {
+				'accept': {
+					method: 'POST',
+					url: 'api/spending/:spendingId/accept'
+				}
+			});
 
-		return {
-      createSpending: (spending, done) => {
-				API.createSpending(spending)
-				.then(function(data) {
-					return done && done(null, data);
-				}, function(err) {
-					return err;
-				})
-			},
-			getSpendings: (done) => {
-				API.getSpendings()
-				.then(function(data) {
-					return done && done(null, data);
-				}, function(err) {
-					return done && done(err);
-				})
-			},
-			deleteSpending: (spending, done) => {
-				API.deleteSpending(spending)
-				.then(function() {
-					return done && done();
-				}, function(err) {
-					return done && done(err);
-				})
-			},
-			updateSpending: (spending, done) => {
-				API.updateSpending(spending)
-				.then(function(data) {
-					return done && done(null, data);
-				}, function(err) {
-					return done && done(err);
-				})
-			},
-			acceptSpending: (spending, done) => {
-				API.acceptSpending(spending)
-				.then(function(data) {
-					return done && done(null, data);
-				}, function(err) {
-					return done && done(err);
-				})
+			return {
+	      createSpending: (spending, done) => {
+					API.save(spending, function(data) {
+						return done && done(null, data);
+					}, function(err) {
+						return err;
+					})
+				},
+				getSpendings: (done) => {
+					API.query(function(data) {
+						return done && done(null, data);
+					}, function(err) {
+						return done && done(err);
+					})
+				},
+				deleteSpending: (spending, done) => {
+					API.delete({spendingId:spending.Id}, function() {
+						return done && done();
+					}, function(err) {
+						return done && done(err);
+					})
+				},
+				updateSpending: (spending, done) => {
+					API.update({spendingId: spending.Id}, spending, function(data) {
+						return done && done(null, data);
+					}, function(err) {
+						return done && done(err);
+					})
+				},
+				acceptSpending: (spending, done) => {
+					API.accept({spendingId: spending.Id}, spending, function(data) {
+						return done && done(null, data);
+					}, function(err) {
+						return done && done(err);
+					})
+				}
 			}
-		}
-	}]);
+	}
+);

@@ -1,33 +1,27 @@
-var path = require('path');
-var Candidato = require(path.join(__dirname, '..', 'index.js')).app.get('models').Candidato;
+const path = require('path');
+const Candidato = require(path.join(__dirname, '..', 'index.js')).app.get('models').Candidato;
 
 module.exports = (req, res, next) => {
-	if(req.signedCookies.candidato)
-	{
+	if(req.signedCookies.candidato) {
 		Candidato
 			.findById(req.signedCookies.candidato)
 			.then((result) => {
 				if(result) {
 					req.user = result;
 					res.cookie('candidato', result.Id, {signed: true, maxAge: 3*24*60*60*1000});
-					res.logout = function() {
+					res.logout = () => {
 						res.clearCookie('candidato');
 					};
 					next();
-				}
-				else
-				{
-					res.status(403);
-					res.send({message: 'Cookie inválido'});
+				} else {
+					res.clearCookie('candidato');
+					res.status(403).json({message: 'Cookie inválido'});
 				}
 			})
 			.catch((err) => {
-				res.status(500);
-				res.send({message: 'Erro Interno'});
+				res.status(500).json({message: 'Erro Interno'});
 			});
-	}
-	else if((req.body.username || req.query.username) && (req.body.password || req.query.password))
-	{
+	} else if((req.body.username || req.query.username) && (req.body.password || req.query.password)) {
 		var username = req.body.username || req.query.username;
 		var password = req.body.password || req.query.password;
 		Candidato
@@ -36,25 +30,19 @@ module.exports = (req, res, next) => {
 				if(result && result.comparePassword(password)) {
 					req.user = result;
 					res.cookie('candidato', result.Id, {signed: true, maxAge: 3*24*60*60*1000});
-					res.logout = function() {
+					res.logout = () => {
 						res.clearCookie('candidato');
 					};
 					next();
-				}
-				else
-				{
-					res.status(403);
-					res.send({message: 'Usuário ou senha inválidos.'});
+				} else {
+					res.clearCookie('candidato');
+					res.status(403).json({message: 'Usuário ou senha inválidos.'});
 				}
 			})
 			.catch((err) => {
-				res.status(500);
-				res.send({message: 'Erro Interno'});
+				res.status(500).json({message: 'Erro Interno'});
 			});
-	}
-	else
-	{
-		res.status(403);
-		res.send({message: 'Autenticação exigida.'});
+	} else {
+		res.status(403).json({message: 'Autenticação exigida.'});
 	}
 };

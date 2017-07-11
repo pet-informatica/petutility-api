@@ -2,7 +2,7 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    queryInterface.changeColumn(
+    return queryInterface.changeColumn(
       'Idea',
       'Description', {
         type: DataTypes.TEXT,
@@ -10,7 +10,7 @@ module.exports = {
       })
   },
   down: function(queryInterface, DataTypes) {
-    queryInterface.changeColumn(
+    return queryInterface.changeColumn(
       'Idea',
       'Description', {
         type: DataTypes.STRING,
