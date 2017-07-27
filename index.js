@@ -49,6 +49,10 @@ app.use('/api/absentOrLate', authenticationService, require(path.join(__dirname,
 app.use('/api/penalty', authenticationService, require(path.join(__dirname, 'routes/penalty')));
 app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
 
+app.use('*', function(req, res) {
+	res.redirect(process.env.FRONT_URL);
+})
+
 // server
 app
 	.get('models')
