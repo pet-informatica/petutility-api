@@ -17,6 +17,13 @@ if(process.env.EMAIL_API && process.env.EMAIL_DOMAIN)
 app.use(bodyParser.urlencoded( { extended: true } ));
 app.use(bodyParser.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', process.env.FRONT_URL);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
 // routes
 var authenticationService = require(path.join(__dirname, 'services', 'petianoAuthentication.js'));
@@ -41,17 +48,6 @@ app.use('/api/agendaPoint', authenticationService, require(path.join(__dirname, 
 app.use('/api/absentOrLate', authenticationService, require(path.join(__dirname, 'routes', 'absentOrLate')));
 app.use('/api/penalty', authenticationService, require(path.join(__dirname, 'routes/penalty')));
 app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
-
-// open route match
-app.get('/', (req, res) =>
-{
-	res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('*', (req, res) =>
-{
-	res.redirect('/');
-});
 
 // server
 app

@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
 		attributes: ['Id', 'Date', 'Status'],
 		order: [['Id', 'DESC']]
 	};
-	if(req.query.yer) {
+	if(req.query.year) {
 		var year = parseInt(req.query.year);
 		query.where = {
 			Date: {
