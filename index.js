@@ -1,40 +1,33 @@
-// dependecies
-var express = require('express');
-var bodyParser = require('body-parser');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var compression = require('compression');
-var htmlPdf = require('html-pdf');
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const htmlPdf = require('html-pdf');
+const nodemailer = require('nodemailer');
+const mailgun = require('nodemailer-mailgun-transport');
+const cors = require('cors');
 
-// express
-var app = module.exports.app = express();
-app.use(compression());
+const app = module.exports.app = express();
+
 app.set('models', require(path.join(__dirname, 'models')));
 app.set('recordOfMeetingRender', require('pug').compileFile(path.join(__dirname, 'printViews', 'recordOfMeeting.pug')));
-if(process.env.EMAIL_API && process.env.EMAIL_DOMAIN)
-	app
-		.set('mailTransporter', require('nodemailer').createTransport(require('nodemailer-mailgun-transport')({auth:{api_key:process.env.EMAIL_API,domain:process.env.EMAIL_DOMAIN}})));
-app.use(bodyParser.urlencoded( { extended: true } ));
+if (process.env.EMAIL_API && process.env.EMAIL_DOMAIN)
+	app.set('mailTransporter', nodemailer.createTransport(mailgun({ auth: { api_key: process.env.EMAIL_API, domain: process.env.EMAIL_DOMAIN } })));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
-app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', process.env.FRONT_URL);
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-});
+app.use(cors({
+	origin: process.env.FRONT_URL,
+	credentials: true
+}));
 
 // routes
-var authenticationService = require(path.join(__dirname, 'services', 'petianoAuthentication.js'));
+const authenticationService = require(path.join(__dirname, 'services', 'petianoAuthentication.js'));
 
-app.use('/public', express.static(path.join(__dirname, 'public', 'bin')));
-app.use('/public/templates', express.static(path.join(__dirname, 'public', 'templates')));
-app.use('/font', express.static(path.join(__dirname, 'public', 'font')));
-app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'img', 'logo.png')));
+// app.use('/api/candidato', require(path.join(__dirname, 'routes/candidato')));
+// app.use('/api/selecao', require(path.join(__dirname, 'routes/selecao')));
+app.use('/api/authentication', require(path.join(__dirname, 'routes/login')));
 app.use('/api/petiano', authenticationService, require(path.join(__dirname, 'routes/petiano')));
-app.use('/api/candidato', require(path.join(__dirname, 'routes/candidato')));
-app.use('/api/selecao', require(path.join(__dirname, 'routes/selecao')));
 app.use('/api/recordOfMeeting', authenticationService, require(path.join(__dirname, 'routes/recordOfMeeting')));
 app.use('/api/petiano', authenticationService, require(path.join(__dirname, 'routes/petiano')));
 app.use('/api/fpass', require(path.join(__dirname, 'routes/fpass')));
@@ -49,36 +42,18 @@ app.use('/api/absentOrLate', authenticationService, require(path.join(__dirname,
 app.use('/api/penalty', authenticationService, require(path.join(__dirname, 'routes/penalty')));
 app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
 
-app.use('*', function(req, res) {
-	res.redirect(process.env.FRONT_URL);
-})
+app.use('*', (req, res) => res.redirect(process.env.FRONT_URL));
 
-// server
-app
-	.get('models')
-	.sequelize
-	.sync()
-	.then(function() {
-		require(path.join(__dirname, 'services', 'devDB.js'))(() => {
-			app
-				.get('models')
-				.PigPET
-				.findById(1)
-				.then((data) => {
-					if(!data)
-						app
-							.get('models')
-							.PigPET
-							.create({
-								Balance: 0.0
-							});
-				});
-			app.listen(process.env.PORT);
-			console.log("app listening at port", process.env.PORT);
-			return;
+app.get('models').sequelize.sync().then(() => {
+	require(path.join(__dirname, 'services', 'devDB.js'))(() => {
+		app.get('models').PigPET.findById(1).then(data => {
+			if (!data)
+				app.get('models').PigPET.create({ Balance: 0.0 });
 		});
-		return;
-	})
-	.catch(function(error) {
-		console.log(error);
+		app.listen(process.env.PORT);
+		console.log("app listening at port", process.env.PORT);
 	});
+})
+.catch(error => {
+	console.log(error);
+});

@@ -1,13 +1,12 @@
-var Sequelize = require('sequelize');
-var database = require('config').get('database');
-var path = require('path');
+const Sequelize = require('sequelize');
+const database = require('config').get('database');
+const path = require('path');
 
 // init sequelize
-var sequelize = new Sequelize(process.env.DATABASE_URL, database.options);
+const sequelize = new Sequelize(process.env.DATABASE_URL, database.options);
 
 // load models
-var models =
-[
+const models = [
 	'PETiano',
 	'RecordOfMeeting',
 	'AgendaPoint',
@@ -24,14 +23,10 @@ var models =
 	'Penalty'
 ];
 
-models.forEach(function(model)
-{
-	module.exports[model] = sequelize.import(path.join(__dirname, model));
-});
+models.forEach(model => module.exports[model] = sequelize.import(path.join(__dirname, model)));
 
 // define relationships
-(function(m)
-{
+((m) => {
 	m.RecordOfMeeting.belongsTo(m.PETiano, {as: 'Ateiro', foreignKey: 'AteiroId'});
 	m.RecordOfMeeting.belongsTo(m.PETiano, {as: 'President', foreignKey: 'PresidentId'});
 	m.AgendaPoint.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});

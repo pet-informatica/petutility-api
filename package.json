@@ -21,6 +21,7 @@
     "compression": "^1.6.2",
     "config": "^1.21.0",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
     "express": "^4.14.0",
     "gulp": "^3.9.1",
     "gulp-angular-templatecache": "^2.0.0",
@@ -30,15 +31,15 @@
     "gulp-sass": "^2.3.2",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-watch": "^4.3.9",
+    "html-pdf": "latest",
     "multer": "latest",
     "multer-storage-cloudinary": "latest",
+    "nodemailer": "latest",
+    "nodemailer-mailgun-transport": "latest",
     "pg": "^6.0.3",
     "pg-hstore": "^2.3.2",
     "pug": "latest",
     "sequelize": "^3.23.6",
-    "html-pdf": "latest",
-    "nodemailer": "latest",
-    "nodemailer-mailgun-transport": "latest",
     "sequelize-cli": "latest"
   }
 }

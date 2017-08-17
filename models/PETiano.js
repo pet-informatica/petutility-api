@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
 			primaryKey: true,
 			autoIncrement: true
 		},
-		Login: {
+		Email: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			unique: true
@@ -25,15 +25,7 @@ module.exports = function(sequelize, DataTypes) {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
-		Balance: {
-			type: DataTypes.FLOAT,
-			allowNull: true
-		},
 		Cpf: {
-			type: DataTypes.STRING,
-			allowNull: true
-		},
-		Email: {
 			type: DataTypes.STRING,
 			allowNull: true
 		},
@@ -56,10 +48,6 @@ module.exports = function(sequelize, DataTypes) {
 				isIn: [['1', '2', '3', '4']]
 			},
 			defaultValue: 1
-		},
-		IdsHistoric: {
-			type: DataTypes.STRING,
-			allowNull: true
 		},
 		Photo: {
 			type: DataTypes.STRING,

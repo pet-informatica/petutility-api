@@ -47,17 +47,17 @@ module.exports = (done) => {
 							CanUpdate: true
 						})
 						.then(function(result) {
-							models
-								.Candidato
-								.create({
-									Login: "candidato",
-									Password: "candidato",
-									Name: "Candidato dos Santos",
-									Email: "candidato@candidato.com",
-									SelecaoId: selecao.Id,
-									EtapaId: result.Id
-								})
-								.then();
+							// models
+							// 	.Candidato
+							// 	.create({
+							// 		Login: "candidato",
+							// 		Password: "candidato",
+							// 		Name: "Candidato dos Santos",
+							// 		Email: "candidato@candidato.com",
+							// 		SelecaoId: selecao.Id,
+							// 		EtapaId: result.Id
+							// 	})
+							// 	.then();
 						});
 					models
 						.Etapa
@@ -70,16 +70,15 @@ module.exports = (done) => {
 				});
 			models
 				.PETiano
-				.create({Login: "pigpet", Password: "pigpet", Profile: 2});
+				.create({Email: "pigpet@petutility.com", Password: "pigpet", Profile: 2});
 			models
 				.PETiano
 				.create({
-					Login: "dev",
+					Email: "admin@petutility.com",
 					Password: "dev",
 					Name: "Developer dos Santos",
 					Balance: 10.05,
 					Cpf: "37166666606",
-					Email: "lcgm@cin.ufpe.br",
 					Rg: "9284948-04",
 					CellPhone: "999999999"
 				})

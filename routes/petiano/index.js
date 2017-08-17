@@ -43,17 +43,7 @@ router.get('/', function(req, res) {
 		})
 })
 
-router.get('/login', function(req, res) {
-	res.json(req.user.toJSON());
-	res.end();
-});
-
-router.get('/logout', function(req, res) {
-	res.clearCookie('user');
-	res.status(200).end();
-});
-
-router.get("/:petianoId", function(req, res) {
+router.get('/:petianoId', function(req, res) {
 	if(req.user.Id === req.params.petianoId)
 	{
 		res.json(req.user);
