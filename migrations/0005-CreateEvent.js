@@ -9,30 +9,17 @@ module.exports = {
   			primaryKey: true,
   			autoIncrement: true
   		},
-  		title: {
+  		Title: {
   			type: DataTypes.STRING,
-  			allowNull: true
+  			allowNull: false
   		},
-  		start: {
-  			type: DataTypes.STRING,
-  			allowNull: true
-  		},
-  		time: {
-  			type: DataTypes.STRING,
-  			allowNull: true
-  		},
-  		end: {
-  			type: DataTypes.STRING,
-  			allowNull: true
-  		},
-      PETianoId: {
-        type: DataTypes.INTEGER,
-        references: {
-          model: 'PETiano',
-          key: 'Id'
-        },
-        onUpdate: 'cascade',
-        onDelete: 'cascade'
+  		Start: {
+  			type: DataTypes.DATE,
+  			allowNull: false
+      },
+      End: {
+        type: DataTypes.DATE,
+        allowNull: false
       }
     });
   },

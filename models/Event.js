@@ -8,21 +8,17 @@ module.exports = function(sequelize, DataTypes) {
 			primaryKey: true,
 			autoIncrement: true
 		},
-		title: {
+		Title: {
 			type: DataTypes.STRING,
-			allowNull: true
+			allowNull: false
 		},
-		start: {
-			type: DataTypes.STRING,
-			allowNull: true
+		Start: {
+			type: DataTypes.DATE,
+			allowNull: false
 		},
-		time: {
-			type: DataTypes.STRING,
-			allowNull: true
-		},
-		end: {
-			type: DataTypes.STRING,
-			allowNull: true
+		End: {
+			type: DataTypes.DATE,
+			allowNull: false
 		}
 	}, {
 		tableName: 'Event',

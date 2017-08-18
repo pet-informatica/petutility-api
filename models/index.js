@@ -12,10 +12,11 @@ const models = [
 	'AgendaPoint',
 	'AbsentOrLate',
 	'Idea',
+	'Event',
+	// Em progresso
 	'Payment',
 	'Pocket',
 	'Spending',
-	'Event',
 	'Candidato',
 	'Selecao',
 	'Etapa',
@@ -37,7 +38,6 @@ models.forEach(model => module.exports[model] = sequelize.import(path.join(__dir
 	m.Idea.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.PETiano.hasMany(m.Payment, {as: {plural: 'Payments', singular: 'Payment'}, foreignKey: 'PETianoId'});
 	m.Spending.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
-	m.Event.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.Selecao.hasMany(m.Etapa, {as: {plural: 'Etapas', singular: 'Etapa'}, foreignKey: 'SelecaoId'});
 	m.Selecao.hasMany(m.Candidato, {as: {plural: 'Candidatos', singular: 'Candidato'}, foreignKey: 'SelecaoId'});
 	m.Etapa.hasMany(m.Candidato, {as: {plural: 'Candidatos', singular: 'Candidato'}, foreignKey: 'EtapaId'});

@@ -9,6 +9,14 @@ module.exports = (done) => {
 		.truncate({cascade: true})
 		.then(() => {
 			models
+				.Event
+				.create({
+					Title: 'Test',
+					Start: new Date(),
+					End: new Date()
+				})
+				.then();
+			models
 				.PigPET
 				.create({
 					Id: 1,
@@ -123,6 +131,22 @@ module.exports = (done) => {
 							CellPhone: "998894338"
 						})
 						.then((result2) => {
+							models
+								.Idea
+								.create({
+									Title: 'Test',
+									Description: 'Testing feature',
+									PETianoId: result2.Id
+								})
+								.then();
+							models
+								.Idea
+								.create({
+									Title: 'Testing again',
+									Description: 'Testing the feature once more',
+									PETianoId: result2.Id
+								})
+								.then();
 							models
 								.PETiano
 								.create({

@@ -16,7 +16,11 @@ router.get('/', function(req, res) {
 
 router.post('/', function(req, res) {
 	Idea
-		.create(req.body)
+		.create({
+			Title: req.body.Title,
+			Description: req.body.Description,
+			PETianoId: req.user.Id,
+		})
 		.then((data) => {
 			res.status(200).json(data.toJSON());
 		})
@@ -26,17 +30,19 @@ router.post('/', function(req, res) {
 });
 
 router.put('/:ideaId', function(req, res) {
-	if(req.body.Title && req.body.Title === '')
+	if(req.body.Title === undefined || req.body.Title === '')
 		return res.status(403).send({message: 'Título exigido'});
 	Idea
-		.update(req.body, {
+		.update({
+			Title: req.body.Title,
+			Description: req.body.Description
+		}, 
+		{
 			where: {
 				Id: req.params.ideaId
 			},
 			returning: true
-		}).then((data) => {
-			res.json(data[1][0].toJSON());
-		})
+		}).then(idea => res.json(idea[1][0]))
 		.catch((err) => {
 			res.status(500).send({message: 'Erro interno'});
 		})

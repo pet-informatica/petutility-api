@@ -1,38 +1,35 @@
 // /api/petiano
 
-var path = require('path');
-var app = require(path.join(__dirname, '../../index')).app;
-var router = require('express').Router();
-var cloudinary = require('cloudinary');
-var cloudinaryStorage = require('multer-storage-cloudinary');
-var multer = require('multer');
+const path = require('path');
+const app = require(path.join(__dirname, '../../index')).app;
+const router = require('express').Router();
+const cloudinary = require('cloudinary');
+const cloudinaryStorage = require('multer-storage-cloudinary');
+const multer = require('multer');
+const PETiano = app.get('models').PETiano;
 
-var parser = multer({
+const parser = multer({
 	storage: cloudinaryStorage({
 		cloudinary: cloudinary,
-		folder: function(req, file, cb){
-			if(file.fieldname == 'Photo'){
+		folder: (req, file, cb) => {
+			if (file.fieldname === 'Photo')
 				cb(undefined, 'userProfile');
-			}
-			else if(file.fieldname == 'CoverPhoto'){
+			else if (file.fieldname === 'CoverPhoto')
 				cb(undefined, 'userCover');
-			}
 		},
-		filename: function(req, file, cb) {
+		filename: (req, file, cb) => {
 			cb(undefined, req.user.Login);
 		}
 	})
 });
 
-router.get('/', function(req, res) {
-	var query = {
+router.get('/', (req, res) => {
+	let query = {
 		where: { }
 	};
-	if(req.body.Profile)
+	if (req.query.Profile)
 		query.where.Profile = req.body.Profile;
-	app
-		.get('models')
-		.PETiano
+	PETiano
 		.findAll(query)
 		.then(function(result) {
 			res.json(result);
@@ -44,24 +41,12 @@ router.get('/', function(req, res) {
 })
 
 router.get('/:petianoId', function(req, res) {
-	if(req.user.Id === req.params.petianoId)
-	{
-		res.json(req.user);
-		res.end();
-		return;
-	}
-	app
-		.get('models')
-		.PETiano
+	if (req.user.Id === req.params.petianoId)
+		return res.status(200).json(req.user);
+	PETiano
 		.findById(req.params.petianoId)
-		.then(function(result) {
-			res.json(result[0].toJSON());
-			res.end();
-		})
-		.catch(function(err) {
-			res.status(500);
-			res.send({message: 'Erro interno'});
-		})
+		.then(result => res.status(200).json(result.toJSON()))
+		.catch(err => res.status(500).send({ message: 'Erro interno' }))
 })
 
 

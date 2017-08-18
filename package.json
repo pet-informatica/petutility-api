@@ -39,6 +39,7 @@
     "pg": "^6.0.3",
     "pg-hstore": "^2.3.2",
     "pug": "latest",
+    "react-big-calendar": "^0.14.4",
     "sequelize": "^3.23.6",
     "sequelize-cli": "latest"
   }

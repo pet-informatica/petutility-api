@@ -24,23 +24,33 @@ app.use(cors({
 // routes
 const authenticationService = require(path.join(__dirname, 'services', 'petianoAuthentication.js'));
 
-// app.use('/api/candidato', require(path.join(__dirname, 'routes/candidato')));
-// app.use('/api/selecao', require(path.join(__dirname, 'routes/selecao')));
-app.use('/api/authentication', require(path.join(__dirname, 'routes/login')));
-app.use('/api/petiano', authenticationService, require(path.join(__dirname, 'routes/petiano')));
+// Refatoradas
+app.use('/api/authentication', require(path.join(__dirname, 'routes/authentication')));
+app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
+app.use('/api/petianos', authenticationService, require(path.join(__dirname, 'routes/petianos')));
+app.use('/api/events', authenticationService, require(path.join(__dirname, 'routes/events')));
+
+// Em progresso
+
+// Faltando
+app.use('/api/agendaPoint', authenticationService, require(path.join(__dirname, 'routes', 'agendaPoint')));
+app.use('/api/absentOrLate', authenticationService, require(path.join(__dirname, 'routes', 'absentOrLate')));
 app.use('/api/recordOfMeeting', authenticationService, require(path.join(__dirname, 'routes/recordOfMeeting')));
-app.use('/api/petiano', authenticationService, require(path.join(__dirname, 'routes/petiano')));
-app.use('/api/fpass', require(path.join(__dirname, 'routes/fpass')));
-app.use('/api/calendar', authenticationService, require(path.join(__dirname, 'routes/calendar')));
-app.use('/api/recordOfMeeting', authenticationService, require(path.join(__dirname, 'routes/recordOfMeeting')));
+
+// TODO Refatorar PigPET
+/*
 app.use('/api/payment', authenticationService, require(path.join(__dirname, 'routes/payment')));
 app.use('/api/pocket', authenticationService, require(path.join(__dirname, 'routes/pocket')));
 app.use('/api/spending', authenticationService, require(path.join(__dirname, 'routes/spending')));
 app.use('/api/pigpet', authenticationService, require(path.join(__dirname, 'routes/pigpet')));
-app.use('/api/agendaPoint', authenticationService, require(path.join(__dirname, 'routes', 'agendaPoint')));
-app.use('/api/absentOrLate', authenticationService, require(path.join(__dirname, 'routes', 'absentOrLate')));
 app.use('/api/penalty', authenticationService, require(path.join(__dirname, 'routes/penalty')));
-app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
+*/
+
+// TODO Refatorar Seleção
+/*
+app.use('/api/candidato', require(path.join(__dirname, 'routes/candidato')));
+app.use('/api/selecao', require(path.join(__dirname, 'routes/selecao')));
+*/
 
 app.use('*', (req, res) => res.redirect(process.env.FRONT_URL));
 
