@@ -1,7 +1,6 @@
 const path = require('path');
 const app = require(path.join(__dirname, '../../index')).app;
 const router = require('express').Router();
-const Sequelize = require('sequelize');
 const Event = app.get('models').Event;
 
 router.get('/', (req, res) => {

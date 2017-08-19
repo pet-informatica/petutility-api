@@ -8,19 +8,19 @@ module.exports = function(sequelize, DataTypes) {
 			primaryKey: true,
 			autoIncrement: true
 		},
-    // Nome do evento
-		Name: {
+    // Titulo do evento
+		Title: {
 			type: DataTypes.STRING,
 			allowNull: false
 		},
     // Data de inicio do evento
     Start: {
-			type: DataTypes.STRING,
+			type: DataTypes.DATE,
 			allowNull: false
 		},
     // Data de termino do evento
     End: {
-			type: DataTypes.STRING,
+			type: DataTypes.DATE,
 			allowNull: false
 		},
     // Quantidade de participantes do evento
@@ -30,18 +30,18 @@ module.exports = function(sequelize, DataTypes) {
 		},
     // Feedback positivo
 		Positive: {
-			type: DataTypes.STRING,
-			allowNull: true
+			type: DataTypes.TEXT,
+			allowNull: false
 		},
     // Feedback negativo
 		Negative: {
-			type: DataTypes.STRING,
-			allowNull: true
+			type: DataTypes.TEXT,
+			allowNull: false
 		},
     // Comentarios no geral
 		Comments: {
-			type: DataTypes.STRING,
-			allowNull: true
+			type: DataTypes.TEXT,
+			allowNull: false
 		}
 	}, {
 		tableName: 'Activity',

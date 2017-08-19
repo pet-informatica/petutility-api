@@ -19,7 +19,7 @@ function genPass() {
   return newPass;
 }
 
-router.post('/forgot', function (req, res) {
+router.post('/forgot', (req, res) => {
   PETiano
     .find({
       where: {
@@ -45,22 +45,21 @@ router.post('/forgot', function (req, res) {
               text: 'Olá ' + result.Name + ', sua nova senha para logar no PETUtility é: ' + newPass + '.'
             }, (err, info) => {
               if (err) {
-                res.status(500).send('Email não pode ser enviado!');
+                res.status(500).json({message: 'Email não pode ser enviado!'});
               } else {
-                console.log(newPass);
                 res.end();
               }
             });
           }).catch((err) => res.status(500).json({ message: 'Erro Interno' }));
+      } else {
+        res.status(404).json({message: 'PETiano not found!'});
       }
-      else
-        res.status(404).end();
     })
     .catch((err) => res.status(500).json({ message: 'Erro Interno' }));
 });
 
 
-router.get('/logout', function(req, res) {
+router.get('/logout', (req, res) => {
   res.clearCookie('user');
   res.status(200).end();
 });

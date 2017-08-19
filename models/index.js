@@ -13,6 +13,7 @@ const models = [
 	'AbsentOrLate',
 	'Idea',
 	'Event',
+	'Activity',
 	// Em progresso
 	'Payment',
 	'Pocket',
@@ -36,6 +37,8 @@ models.forEach(model => module.exports[model] = sequelize.import(path.join(__dir
 	m.AbsentOrLate.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.AgendaPoint.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.Idea.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
+	m.Activity.belongsTo(m.PETiano, { as: 'PETiano', foreignKey: 'PETianoId' });
+
 	m.PETiano.hasMany(m.Payment, {as: {plural: 'Payments', singular: 'Payment'}, foreignKey: 'PETianoId'});
 	m.Spending.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.Selecao.hasMany(m.Etapa, {as: {plural: 'Etapas', singular: 'Etapa'}, foreignKey: 'SelecaoId'});

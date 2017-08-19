@@ -81,6 +81,9 @@ module.exports = (done) => {
 				.create({Email: "pigpet@petutility.com", Password: "pigpet", Profile: 2});
 			models
 				.PETiano
+				.create({ Email: "pgrr@cin.ufpe.br", Password: "dev" });
+			models
+				.PETiano
 				.create({
 					Email: "admin@petutility.com",
 					Password: "dev",
@@ -131,6 +134,19 @@ module.exports = (done) => {
 							CellPhone: "998894338"
 						})
 						.then((result2) => {
+							models
+								.Activity
+								.create({
+									Title: 'Teste',
+									Start: new Date(),
+									End: new Date(),
+									Participants: 10,
+									Positive: 'Nenhum',
+									Negative: 'Nenhum',
+									Comments: 'Nenhum',
+									PETianoId: result2.Id
+								})
+								.then();
 							models
 								.Idea
 								.create({

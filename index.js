@@ -29,6 +29,7 @@ app.use('/api/authentication', require(path.join(__dirname, 'routes/authenticati
 app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
 app.use('/api/petianos', authenticationService, require(path.join(__dirname, 'routes/petianos')));
 app.use('/api/events', authenticationService, require(path.join(__dirname, 'routes/events')));
+app.use('/api/activities', authenticationService, require(path.join(__dirname, 'routes/activities')));
 
 // Em progresso
 

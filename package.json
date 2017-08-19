@@ -6,15 +6,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "devStart": "npm install && sequelize db:migrate && (gulp &) && nodemon --ignore public/ --ignore gulpfile.js index.js",
-    "heroku-postbuild": "./node_modules/sequelize-cli/bin/sequelize db:migrate; ./node_modules/gulp/bin/gulp.js production",
-    "clear": "rm -r node_modules & rm -r bower_components & rm .bower.json.md5 & rm .package.json.md5 & rm -r public/bin"
+    "devStart": "npm install && sequelize db:migrate &&  nodemon --ignore public/ index.js",
+    "heroku-postbuild": "./node_modules/sequelize-cli/bin/sequelize db:migrate;",
+    "clear": "rm -r node_modules & rm .package.json.md5"
   },
   "author": "PET",
   "license": "ISC",
   "dependencies": {
     "async": "latest",
-    "babel-preset-es2015": "^6.14.0",
     "bcrypt": "^0.8.7",
     "body-parser": "^1.15.2",
     "cloudinary": "latest",
@@ -23,14 +22,6 @@
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.14.0",
-    "gulp": "^3.9.1",
-    "gulp-angular-templatecache": "^2.0.0",
-    "gulp-babel": "^6.1.2",
-    "gulp-concat": "^2.6.0",
-    "gulp-plumber": "^1.1.0",
-    "gulp-sass": "^2.3.2",
-    "gulp-sourcemaps": "^1.6.0",
-    "gulp-watch": "^4.3.9",
     "html-pdf": "latest",
     "multer": "latest",
     "multer-storage-cloudinary": "latest",
@@ -39,7 +30,6 @@
     "pg": "^6.0.3",
     "pg-hstore": "^2.3.2",
     "pug": "latest",
-    "react-big-calendar": "^0.14.4",
     "sequelize": "^3.23.6",
     "sequelize-cli": "latest"
   }
