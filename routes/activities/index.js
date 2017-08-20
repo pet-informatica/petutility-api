@@ -21,8 +21,8 @@ router.post('/', (req, res) => {
     Activity
         .create({
             Title: req.body.Title,
-            Start: req.body.Start,
             End: req.body.End,
+            Start: req.body.Start,
             Participants: req.body.Participants,
             Positive: req.body.Positive,
             Negative: req.body.Negative,
@@ -33,8 +33,9 @@ router.post('/', (req, res) => {
         .catch(err => res.status(500).send('Internal server error'));
 });
 
-// ????
+/*
 router.put('/:activityId', (req, res) => {
+    return res.end();
     Activity
         .update({
             Title: req.body.Title,
@@ -55,8 +56,8 @@ router.put('/:activityId', (req, res) => {
         .catch(err => res.status(500).send('Internal server error'));
 });
 
-// ????
 router.delete('/:activityId', (req, res) => {
+    return res.end();
     Activity
         .destroy({ where: {
             Id: req.params.activityId
@@ -64,5 +65,6 @@ router.delete('/:activityId', (req, res) => {
         .then(result => res.end())
         .catch(err => res.status(500).send('Internal server error'));
 });
+*/
 
 module.exports = router;

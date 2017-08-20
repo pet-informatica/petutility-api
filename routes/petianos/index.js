@@ -1,5 +1,3 @@
-// /api/petiano
-
 const path = require('path');
 const app = require(path.join(__dirname, '../../index')).app;
 const router = require('express').Router();
@@ -24,9 +22,7 @@ const parser = multer({
 });
 
 router.get('/', (req, res) => {
-	let query = {
-		where: { }
-	};
+	let query = {where: {}};
 	if (req.query.Profile)
 		query.where.Profile = req.body.Profile;
 	PETiano
@@ -40,7 +36,7 @@ router.get('/', (req, res) => {
 		})
 })
 
-router.get('/:petianoId', function(req, res) {
+router.get('/:petianoId', (req, res) => {
 	if (req.user.Id === req.params.petianoId)
 		return res.status(200).json(req.user);
 	PETiano
@@ -50,56 +46,37 @@ router.get('/:petianoId', function(req, res) {
 })
 
 
-router.post('/update', function(req, res) {
-
-	var uploader = parser.fields([
+router.put('/', (req, res) => {
+	const uploader = parser.fields([
 		{name:'Photo', maxCount:1},
 		{name: 'CoverPhoto', maxCount:1}
 	]);
-
-	uploader(req, res, function(error){
-		if(error){
-			return res.status(500).end();
-		}
-		var user = req.user,
-		newUser = req.body;
-		if(req.files.Photo)
+	uploader(req, res, err => {
+		if (err)
+			return res.status(500).json({ message: 'Erro interno' });
+		let user = req.user;
+		let newUser = req.body;
+		if (req.files && req.files.Photo)
 			user.set('Photo', req.files.Photo[0].secure_url + '?f=auto');
-		if(req.files.CoverPhoto)
+		if (req.files && req.files.CoverPhoto)
 			user.set('CoverPhoto', req.files.CoverPhoto[0].secure_url + '?f=auto');
-		if(newUser.Name)
+		if (newUser.Name)
 			user.set('Name', newUser.Name);
-		if(newUser.Email)
+		if (newUser.Email)
 			user.set('Email', newUser.Email);
-		if(newUser.Cpf)
+		if (newUser.Cpf !== undefined)
 			user.set('Cpf', newUser.Cpf);
-		if(newUser.Rg)
+		if (newUser.Rg !== undefined)
 			user.set('Rg', newUser.Rg);
+		if (newUser.OldPassword && newUser.Password && user.comparePassword(newUser.OldPassword))
+			user.set('Password', newUser.Password);
 		user
 			.save()
-			.then(function(result) {
-				res.json(result);
-				res.end();
-			})
-			.catch((err) => {
-				res.status(500);
-				res.send({message: 'Erro interno'});
-		});
+			.then(result => res.status(200).json(result))
+			.catch(err => res.status(500).json({ message: 'Erro interno' }));
 
 	})
 
-});
-
-router.post('/updatePassword', function(req, res) {
-	if(req.user.comparePassword(req.body.oldPassword)) {
-		req.user.set('Password', req.body.newPassword);
-		req.user.save().then((result) => {
-			res.end();
-		})
-	} else {
-		res.status(304);
-		res.send('Senha incorreta');
-	}
 });
 
 module.exports = router;
