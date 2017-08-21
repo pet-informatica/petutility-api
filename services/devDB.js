@@ -78,12 +78,6 @@ module.exports = (done) => {
 				});
 			models
 				.PETiano
-				.create({Email: "pigpet@petutility.com", Password: "pigpet", Profile: 2});
-			models
-				.PETiano
-				.create({ Email: "pgrr@cin.ufpe.br", Password: "dev" });
-			models
-				.PETiano
 				.create({
 					Email: "admin@petutility.com",
 					Password: "dev",
@@ -91,7 +85,8 @@ module.exports = (done) => {
 					Balance: 10.05,
 					Cpf: "37166666606",
 					Rg: "9284948-04",
-					CellPhone: "999999999"
+					CellPhone: "999999999",
+					Profile: 3
 				})
 				.then((result1) => {
 					models

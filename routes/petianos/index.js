@@ -45,6 +45,40 @@ router.get('/:petianoId', (req, res) => {
 		.catch(err => res.status(500).send({ message: 'Erro interno' }))
 })
 
+// admin invite to petiano
+router.post('/', (req, res, next) => {
+	if (req.user.Profile === 3 && req.body.email) {
+		next();
+	} else if (req.user.Profile === 3) {
+		res.status(400).json({ message: 'Email invalido' });
+	} else {
+		res.status(403).json({message: 'Somente o administrador pode usar essa funcao'});
+	}
+}, (req, res) => {
+	let email = req.body.email;
+	let pass = app.get('genPass')();
+	PETiano
+		.create({Email: email, Password: pass})
+		.then(result => {
+			let transp = app.get('mailTransporter');
+			transp.sendMail({
+				from: '"PETUtility" <' + process.env.EMAIL + '>',
+				to: result.Email,
+				subject: 'Convite ao PETUtility',
+				text: 'Olá, você foi convidado(a) para utilizar o PETUtility!\n\n'+
+					  'Para logar é fácil, basta ir até '+process.env.FRONT_URL+
+					  ' e usar o seu email com a seguinte senha: "'+pass+'"'
+			}, (err, info) => {
+				console.log(pass);
+				if (err) {
+					res.status(500).json({ message: 'Email não pode ser enviado!' });
+				} else {
+					res.status(201).json(result);
+				}
+			});
+		})
+		.catch(err => res.status(500).send({ message: 'Erro interno' }))
+});
 
 router.put('/', (req, res) => {
 	const uploader = parser.fields([

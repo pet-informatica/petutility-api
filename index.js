@@ -13,6 +13,19 @@ app.set('models', require(path.join(__dirname, 'models')));
 app.set('recordOfMeetingRender', require('pug').compileFile(path.join(__dirname, 'printViews', 'recordOfMeeting.pug')));
 if (process.env.EMAIL_API && process.env.EMAIL_DOMAIN)
 	app.set('mailTransporter', nodemailer.createTransport(mailgun({ auth: { api_key: process.env.EMAIL_API, domain: process.env.EMAIL_DOMAIN } })));
+app.set('genPass', () => {
+	let newPass = "";
+	const alphabet = "AB8C70DEF1GHI62JKLM3NO5PQRS4TUVWXYZabcd9fghijklmnopqrstuvwxyz";
+	for (let i = 0; i < 8; ++i) {
+		let temp = Math.floor((Math.random() * 100));
+		while (temp >= alphabet.length)
+			temp >>= 1;
+		if (typeof alphabet[temp] === undefined)
+			temp = 44;
+		newPass += alphabet[temp];
+	}
+	return newPass;
+});
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
@@ -59,8 +72,24 @@ app.get('models').sequelize.sync().then(() => {
 	require(path.join(__dirname, 'services', 'devDB.js'))(() => {
 		app.get('models').PigPET.findById(1).then(data => {
 			if (!data)
-				app.get('models').PigPET.create({ Balance: 0.0 });
+				app.get('models').PigPET.create({
+					Balance: 0.0
+				}).then(result => console.log('pigpet created'));
 		});
+		app.get('models').PETiano.findOne({ Email: "admin@petutility.com"}).then(data => {
+			if (!data) {
+				app.get('models').PETiano.create({
+					Email: "admin@petutility.com",
+					Password: "dev",
+					Name: "Developer dos Santos",
+					Balance: 10.05,
+					Cpf: "37166666606",
+					Rg: "9284948-04",
+					CellPhone: "999999999",
+					Profile: 3
+				}).then(result => console.log('admin created'));
+			}
+		})
 		app.listen(process.env.PORT);
 		console.log("app listening at port", process.env.PORT);
 	});

@@ -5,20 +5,6 @@ const app = require(path.join(__dirname, '../../index')).app;
 const PETiano = app.get('models').PETiano;
 const authenticationService = require(path.join(__dirname, '..', '..', 'services', 'petianoAuthentication'));
 
-function genPass() {
-  let newPass = "";
-  const alphabet = "AB8C70DEF1GHI62JKLM3NO5PQRS4TUVWXYZabcd9fghijklmnopqrstuvwxyz";
-  for (let i=0;i<8;++i) {
-    let temp = Math.floor((Math.random() * 100));
-    while (temp >= alphabet.length)
-      temp >>= 1;
-    if (typeof alphabet[temp] === undefined)
-      temp = 44;
-    newPass += alphabet[temp];
-  }
-  return newPass;
-}
-
 router.post('/forgot', (req, res) => {
   PETiano
     .find({
@@ -27,7 +13,7 @@ router.post('/forgot', (req, res) => {
       }
     }).then(result => {
       if (result) {
-        let newPass = genPass();
+        let newPass = app.get('genPass')();
         PETiano
           .update({
             Password: newPass
