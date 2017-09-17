@@ -51,11 +51,11 @@ module.exports = function(sequelize, DataTypes) {
 		},
 		Photo: {
 			type: DataTypes.STRING,
-			defaultValue: (cloudinary.url('userProfile/default.jpg') + '?f=auto')
+			defaultValue: (cloudinary.url('userProfile/default.jpg', { secure: true }) + '?f=auto')
 		},
 		CoverPhoto: {
 			type: DataTypes.STRING,
-			defaultValue: (cloudinary.url('userCover/default.jpg') + '?f=auto')
+			defaultValue: (cloudinary.url('userCover/default.jpg', { secure: true }) + '?f=auto')
 		}
 	}, {
 		tableName: 'PETiano',

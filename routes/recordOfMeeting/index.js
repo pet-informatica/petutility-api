@@ -266,7 +266,7 @@ router.post('/', lockerFunction, function(req, res) {
 						ret.Ateiro = lastRecord.Ateiro.toJSON();
 						ret.President = lastRecord.President.toJSON();
 						ret.AgendaPoints = [];
-					  ret.AgendaPoints = results[0].concat(results[1]);
+					  	ret.AgendaPoints = results[0].concat(results[1]);
 						ret.AbsentsOrLates = [];
 						res.status(201).json(ret);
 					});
