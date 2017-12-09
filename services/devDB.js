@@ -117,6 +117,33 @@ module.exports = (done) => {
 						})
 						.then();
 					models
+						.AgendaPoint
+						.create({
+							Title: 'Teste 4',
+							Description: 'TESTTEEEEEEE d',
+							PETianoId: result1.Id,
+							Status: 1
+						})
+						.then();
+					models
+						.AgendaPoint
+						.create({
+							Title: 'Teste 5',
+							Description: 'TESTTEEEEEEE e',
+							PETianoId: result1.Id,
+							Status: 1
+						})
+						.then();
+					models
+						.AgendaPoint
+						.create({
+							Title: 'Teste 6',
+							Description: 'TESTTEEEEEEE f',
+							PETianoId: result1.Id,
+							Status: 1
+						})
+						.then();
+					models
 						.PETiano
 						.create({
 							Login: "dgmneto",

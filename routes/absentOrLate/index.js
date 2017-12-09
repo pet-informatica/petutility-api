@@ -2,13 +2,12 @@ const path = require('path');
 const app = require(path.join(__dirname, '../../index')).app;
 const router = require('express').Router();
 const parallel = require('async/parallel');
+const AbsentOrLate = app.get('models').AbsentOrLate;
 
-router.post('/', function(req, res) {
+router.post('/', (req, res) => {
 	parallel([
 		(callback) => {
-			app
-				.get('models')
-				.AbsentOrLate
+			AbsentOrLate
 				.destroy({
 					where: {
 						RecordOfMeetingId: req.body.RecordOfMeetingId,
@@ -23,9 +22,7 @@ router.post('/', function(req, res) {
 				});
 		},
 		(callback) => {
-			app
-				.get('models')
-				.AbsentOrLate
+			AbsentOrLate
 				.create(req.body)
 				.then(function(result) {
 					callback(null, result);
@@ -35,39 +32,30 @@ router.post('/', function(req, res) {
 				});
 		}
 	], (err, results) => {
-		if(err)
-		{
-			res.status(500);
-			res.send({message: 'Erro interno'});
+		if (err) {
+			res.status(500).json({message: 'Erro interno'});
 			return;
 		}
-		res.json(results[1].toJSON());
-		res.end();
+		res.status(201).json(results[1].toJSON());
 	});
 
 });
 
-router.put('/:id', function(req, res) {
-	app
-		.get('models')
-		.AbsentOrLate
+router.put('/:id', (req, res) => {
+	AbsentOrLate
 		.update(
 			req.body,
 			{where: {Id: req.params.id}, returning: true})
 		.then(function(result) {
-			res.json(result[1][0].toJSON());
-			res.end();
+			res.status(200).json(result[1][0].toJSON());
 		})
 		.catch(function(err) {
-			res.status(500);
-			res.send({message: 'Erro interno'});
+			res.status(500).json({message: 'Erro interno'});
 		})
 });
 
-router.delete('/:id', function(req, res) {
-	app
-		.get('models')
-		.AbsentOrLate
+router.delete('/:id', (req, res) => {
+	AbsentOrLate
 		.destroy({where: {Id: req.params.id}})
 		.then(function() {
 			res.end();
