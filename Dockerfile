@@ -2,7 +2,7 @@ FROM node:8
 
 MAINTAINER PET
 
-RUN npm install -g nodemon bower gulp-cli
+RUN npm install -g nodemon
 
 RUN mkdir -pv /www
 WORKDIR /www

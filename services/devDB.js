@@ -17,66 +17,6 @@ module.exports = (done) => {
 				})
 				.then();
 			models
-				.PigPET
-				.create({
-					Id: 1,
-					Balance: 1000.00
-				})
-				.then();
-			models
-				.Selecao
-				.create({
-					Year: 2014,
-					Description: 'teste 1',
-					IsOpen: false
-				})
-				.then();
-			models
-				.Selecao
-				.create({
-					Year: 2015,
-					Description: 'teste 2',
-					IsOpen: false
-				})
-				.then();
-			models
-				.Selecao
-				.create({
-					Year: 2016,
-					Description: 'Seleção para o PET 2016',
-					IsOpen: true
-				})
-				.then(function(selecao) {
-					models
-						.Etapa
-						.create({
-							SelecaoId: selecao.Id,
-							Description: 'Entrega de cv e historico escolar, só 16 passam',
-							CanUpdate: true
-						})
-						.then(function(result) {
-							// models
-							// 	.Candidato
-							// 	.create({
-							// 		Login: "candidato",
-							// 		Password: "candidato",
-							// 		Name: "Candidato dos Santos",
-							// 		Email: "candidato@candidato.com",
-							// 		SelecaoId: selecao.Id,
-							// 		EtapaId: result.Id
-							// 	})
-							// 	.then();
-						});
-					models
-						.Etapa
-						.create({
-							SelecaoId: selecao.Id,
-							Description: 'Dinamica de grupo e entrevista',
-							CanUpdate: false
-						})
-						.then();
-				});
-			models
 				.PETiano
 				.create({
 					Email: "admin@petutility.com",

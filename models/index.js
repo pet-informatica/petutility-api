@@ -13,16 +13,7 @@ const models = [
 	'AbsentOrLate',
 	'Idea',
 	'Event',
-	'Activity',
-	// Em progresso
-	'Payment',
-	'Pocket',
-	'Spending',
-	'Candidato',
-	'Selecao',
-	'Etapa',
-	'PigPET',
-	'Penalty'
+	'Activity'
 ];
 
 models.forEach(model => module.exports[model] = sequelize.import(path.join(__dirname, model)));
@@ -38,13 +29,6 @@ models.forEach(model => module.exports[model] = sequelize.import(path.join(__dir
 	m.AgendaPoint.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.Idea.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
 	m.Activity.belongsTo(m.PETiano, { as: 'PETiano', foreignKey: 'PETianoId' });
-
-	m.PETiano.hasMany(m.Payment, {as: {plural: 'Payments', singular: 'Payment'}, foreignKey: 'PETianoId'});
-	m.Spending.belongsTo(m.PETiano, {as: 'PETiano', foreignKey: 'PETianoId'});
-	m.Selecao.hasMany(m.Etapa, {as: {plural: 'Etapas', singular: 'Etapa'}, foreignKey: 'SelecaoId'});
-	m.Selecao.hasMany(m.Candidato, {as: {plural: 'Candidatos', singular: 'Candidato'}, foreignKey: 'SelecaoId'});
-	m.Etapa.hasMany(m.Candidato, {as: {plural: 'Candidatos', singular: 'Candidato'}, foreignKey: 'EtapaId'});
-	m.PETiano.hasMany(m.Penalty, {as: {plural: 'Penalties', singular: 'Penalty'}, foreignKey: 'PETianoId'});
 })(module.exports);
 
 // export sequelize connection

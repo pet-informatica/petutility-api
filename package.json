@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "devStart": "npm install && sequelize db:migrate &&  nodemon --ignore public/ index.js",
+    "devStart": "npm install && sequelize db:migrate && nodemon index.js",
     "heroku-postbuild": "./node_modules/sequelize-cli/bin/sequelize db:migrate;",
     "clear": "rm -r node_modules & rm .package.json.md5"
   },
