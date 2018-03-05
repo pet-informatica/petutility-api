@@ -2,26 +2,26 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    return queryInterface.createTable('Event', {
+    return queryInterface.createTable('Penalty', {
       Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
   			primaryKey: true,
   			autoIncrement: true
   		},
-  		title: {
-  			type: DataTypes.STRING,
-  			allowNull: true
+  		Value: {
+  			type: DataTypes.FLOAT,
+  			allowNull: false
   		},
-  		start: {
-  			type: DataTypes.STRING,
-  			allowNull: true
+  		Date: {
+  			type: DataTypes.DATE,
+  			allowNull: false
   		},
-  		time: {
-  			type: DataTypes.STRING,
-  			allowNull: true
+  		Status: {
+  			type: DataTypes.INTEGER,
+  			allowNull: false
   		},
-  		end: {
+  		PenaltyJustification: {
   			type: DataTypes.STRING,
   			allowNull: true
   		},
@@ -37,6 +37,6 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes) {
-    return queryInterface.dropTable('Event');
+    return queryInterface.dropTable('Penalty');
   }
 }

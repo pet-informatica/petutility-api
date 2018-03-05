@@ -9,14 +9,6 @@ module.exports = (done) => {
 		.truncate({cascade: true})
 		.then(() => {
 			models
-				.Event
-				.create({
-					Title: 'Test',
-					Start: new Date(),
-					End: new Date()
-				})
-				.then();
-			models
 				.PETiano
 				.create({
 					Email: "admin@petutility.com",

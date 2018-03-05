@@ -37,10 +37,8 @@ const authenticationService = require(path.join(__dirname, 'services', 'petianoA
 app.use('/api/authentication', require(path.join(__dirname, 'routes/authentication')));
 app.use('/api/ideas', authenticationService, require(path.join(__dirname, 'routes/ideas')));
 app.use('/api/petianos', authenticationService, require(path.join(__dirname, 'routes/petianos')));
-app.use('/api/events', authenticationService, require(path.join(__dirname, 'routes/events')));
+// app.use('/api/events', authenticationService, require(path.join(__dirname, 'routes/events')));
 app.use('/api/activities', authenticationService, require(path.join(__dirname, 'routes/activities')));
-
-// TODO
 app.use('/api/agendaPoint', authenticationService, require(path.join(__dirname, 'routes', 'agendaPoint')));
 app.use('/api/absentOrLate', authenticationService, require(path.join(__dirname, 'routes', 'absentOrLate')));
 app.use('/api/recordOfMeeting', authenticationService, require(path.join(__dirname, 'routes/recordOfMeeting')));

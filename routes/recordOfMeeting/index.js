@@ -94,9 +94,9 @@ router.get('/:recordOfMeetingId/download', (req, res) => {
 		});
 });
 
-var locker = false;
+let locker = false;
 
-var lockerFunction = function(req, res, next) {
+const lockerFunction = function(req, res, next) {
 	if (locker)
 		res.status(400).json({message: 'Ata bloqueada no momento'});
 	else

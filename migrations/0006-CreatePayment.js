@@ -2,26 +2,50 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    return queryInterface.createTable('Event', {
+    return queryInterface.createTable('Payment', {
       Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
   			primaryKey: true,
   			autoIncrement: true
   		},
-  		title: {
+  		Type: {
+  			type: DataTypes.INTEGER,
+  			allowNull: false
+  		},
+  		Value: {
+  			type: DataTypes.FLOAT,
+  			allowNull: false
+  		},
+  		Date: {
+  			type: DataTypes.DATE,
+  			allowNull: false
+  		},
+  		Status: {
+  			type: DataTypes.INTEGER,
+  			allowNull: false
+  		},
+  		PenaltyJustification: {
   			type: DataTypes.STRING,
   			allowNull: true
   		},
-  		start: {
+  		RefusedJustification: {
   			type: DataTypes.STRING,
   			allowNull: true
   		},
-  		time: {
+  		Photo: {
+  			type: DataTypes.BLOB,
+  			allowNull: true
+  		},
+  		Instrument: {
+  			type: DataTypes.INTEGER,
+  			allowNull: false
+  		},
+  		Notes: {
   			type: DataTypes.STRING,
   			allowNull: true
   		},
-  		end: {
+  		Ids: {
   			type: DataTypes.STRING,
   			allowNull: true
   		},
@@ -37,6 +61,6 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes) {
-    return queryInterface.dropTable('Event');
+    return queryInterface.dropTable('Payment');
   }
 }

@@ -12,10 +12,9 @@ module.exports = {
     			primaryKey: true,
     			autoIncrement: true
     		},
-        Email: {
+    		Login: {
     			type: DataTypes.STRING,
-    			allowNull: false,
-          unique: true
+    			allowNull: false
     		},
     		Password: {
     			type: DataTypes.STRING,
@@ -33,6 +32,10 @@ module.exports = {
     			allowNull: true
     		},
     		Cpf: {
+    			type: DataTypes.STRING,
+    			allowNull: true
+    		},
+    		Email: {
     			type: DataTypes.STRING,
     			allowNull: true
     		},
@@ -55,6 +58,10 @@ module.exports = {
     				isIn: [['1', '2', '3', '4']]
     			},
     			defaultValue: 1
+    		},
+    		IdsHistoric: {
+    			type: DataTypes.STRING,
+    			allowNull: true
     		},
     		Photo: {
     			type: DataTypes.STRING,

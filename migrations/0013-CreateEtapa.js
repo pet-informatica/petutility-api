@@ -2,33 +2,25 @@
 
 module.exports = {
   up: function(queryInterface, DataTypes) {
-    return queryInterface.createTable('Event', {
+    return queryInterface.createTable('Etapa', {
       Id: {
   			type: DataTypes.INTEGER,
   			allowNull: false,
   			primaryKey: true,
   			autoIncrement: true
   		},
-  		title: {
+  		Description: {
   			type: DataTypes.STRING,
-  			allowNull: true
+  			allowNull: false
   		},
-  		start: {
-  			type: DataTypes.STRING,
-  			allowNull: true
+  		CanUpdate: {
+  			type: DataTypes.BOOLEAN,
+  			allowNull: false
   		},
-  		time: {
-  			type: DataTypes.STRING,
-  			allowNull: true
-  		},
-  		end: {
-  			type: DataTypes.STRING,
-  			allowNull: true
-  		},
-      PETianoId: {
+      SelecaoId: {
         type: DataTypes.INTEGER,
         references: {
-          model: 'PETiano',
+          model: 'Selecao',
           key: 'Id'
         },
         onUpdate: 'cascade',
@@ -37,6 +29,6 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes) {
-    return queryInterface.dropTable('Event');
+    return queryInterface.dropTable('Etapa');
   }
 }
