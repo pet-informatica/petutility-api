@@ -69,7 +69,7 @@ router.post('/', (req, res, next) => {
 					  'Para logar é fácil, basta ir até '+process.env.FRONT_URL+
 					  ' e usar o seu email com a seguinte senha: "'+pass+'"'
 			}, (err, info) => {
-				console.log(pass);
+				// console.log(pass);
 				if (err) {
 					res.status(500).json({ message: 'Email não pode ser enviado!' });
 				} else {

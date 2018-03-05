@@ -7,22 +7,19 @@ const authenticationService = require(path.join(__dirname, '..', '..', 'services
 
 router.post('/forgot', (req, res) => {
   PETiano
-    .find({
-      where: {
-        Email: req.body.email
-      }
-    }).then(result => {
+    .find({where: {
+      Email: req.body.email
+    }})
+    .then(result => {
       if (result) {
         let newPass = app.get('genPass')();
         PETiano
           .update({
             Password: newPass
-          },
-          { 
-            where: {
-              Id: result.Id
-            }
-          }).then((result) => {
+          }, {
+            where: { Id: result.Id }
+          })
+          .then((result) => {
             let transp = app.get('mailTransporter');
             transp.sendMail({
               from: '"PETUtility" <' + process.env.EMAIL + '>',
