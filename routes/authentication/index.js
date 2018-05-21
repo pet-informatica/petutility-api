@@ -7,38 +7,42 @@ const authenticationService = require(path.join(__dirname, '..', '..', 'services
 
 router.post('/forgot', (req, res) => {
   PETiano
-    .find({where: {
+    .findOne({where: {
       Email: req.body.email
     }})
     .then(result => {
-      if (result) {
-        let newPass = app.get('genPass')();
-        PETiano
-          .update({
-            Password: newPass
-          }, {
-            where: { Id: result.Id }
-          })
-          .then((result) => {
-            let transp = app.get('mailTransporter');
-            transp.sendMail({
-              from: '"PETUtility" <' + process.env.EMAIL + '>',
-              to: result.Email,
-              subject: 'Senha PETUtility',
-              text: 'Olá ' + result.Name + ', sua nova senha para logar no PETUtility é: ' + newPass + '.'
-            }, (err, info) => {
-              if (err) {
-                res.status(500).json({message: 'Email não pode ser enviado!'});
-              } else {
-                res.end();
-              }
-            });
-          }).catch((err) => res.status(500).json({ message: 'Erro Interno' }));
-      } else {
+      if (!result) {
         res.status(404).json({message: 'PETiano not found!'});
+        return;
       }
+      const newPass = app.get('genPass')();
+      PETiano
+        .update({
+          Password: newPass
+        }, {
+          where: { Id: result.Id }
+        })
+        .then(() => {
+          const user = result;
+          const transp = app.get('mailTransporter');
+          const options = {
+            from: '"PETUtility" <' + process.env.EMAIL + '>',
+            to: user.Email,
+            subject: 'Senha PETUtility',
+            text: 'Olá ' + user.Name + ', sua nova senha para logar no PETUtility é: ' + newPass + '.'
+          };
+          transp.sendMail(options, (err, info) => {
+            if (err) {
+              // res.status(500).json({message: 'Email não pode ser enviado!'});
+              res.status(500).json({message: JSON.stringify(err)});
+            } else {
+              res.end();
+            }
+          });
+        })
+        .catch(err => res.status(500).json({ message: 'Erro Interno' }));
     })
-    .catch((err) => res.status(500).json({ message: 'Erro Interno' }));
+    .catch(err => res.status(500).json({ message: 'Erro Interno' }));
 });
 
 
