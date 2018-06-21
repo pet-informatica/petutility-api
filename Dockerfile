@@ -2,9 +2,12 @@ FROM node:8
 
 MAINTAINER PET
 
-RUN npm install -g nodemon
+WORKDIR www
 
-RUN mkdir -pv /www
-WORKDIR /www
+COPY package*.json ./
 
-CMD npm run devStart
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "start"]

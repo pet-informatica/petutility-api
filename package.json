@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "devStart": "npm install && sequelize db:migrate && nodemon index.js",
     "heroku-postbuild": "./node_modules/sequelize-cli/lib/sequelize db:migrate;",
@@ -32,5 +31,8 @@
     "pug": "latest",
     "sequelize": "^3.23.6",
     "sequelize-cli": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.10.2"
   }
 }
